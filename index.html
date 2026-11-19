@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Estudo Escrivão PC-PA</title>
+<meta name="description" content="Controle de estudo e questões para Escrivão da Polícia Civil do Pará">
+<meta name="theme-color" content="#081433">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Escrivão PC-PA">
+<style>
+:root{
+  --bg:#081433;--s1:#0f2257;--s2:#16307a;--line:#223a85;
+  --tx:#f3f6ff;--mu:#a3b3dc;--ac:#ffd60a;--acx:#1a1400;
+  --good:#3ddc97;--mid:#ffb020;--bad:#ff6b6b;--none:#8393bd;
+  --hit:#4f9bff;--err:#fb923c;
+  --r:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding-top:env(safe-area-inset-top);padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+h1,h2,h3,p{margin:0}
+header.top{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg),var(--bg) 85%,transparent);padding:14px 16px 8px;max-width:720px;margin:0 auto}
+header.top h1{font-size:20px;font-weight:800;letter-spacing:-.2px}
+header.top h1 span{color:var(--ac)}
+header.top p{color:var(--mu);font-size:13px}
+main{max-width:720px;margin:0 auto;padding:4px 16px 24px;display:grid;gap:14px}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.card h2{font-size:15px;font-weight:700;margin-bottom:10px}
+.sub{color:var(--mu);font-size:13px}
+.row{display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+.sp{justify-content:space-between}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.btn{background:var(--ac);color:var(--acx);font-weight:700;border-radius:12px;padding:11px 16px;text-align:center}
+.btn.sec{background:var(--s2);color:var(--tx)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--tx)}
+.btn.danger{background:transparent;border:1px solid var(--bad);color:var(--bad)}
+.btn.full{width:100%}
+.mini{background:var(--s2);border-radius:10px;padding:7px 10px;font-size:13px;font-weight:700;white-space:nowrap}
+.bar{height:8px;background:var(--bg);border-radius:99px;position:relative;overflow:visible}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--tc,var(--none))}
+.bar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--tx);opacity:.7;border-radius:2px}
+.bad{--tc:var(--bad)}.mid{--tc:var(--mid)}.good{--tc:var(--good)}.none{--tc:var(--none)}
+.bd{font-size:12px;font-weight:700;border-radius:99px;padding:3px 9px;white-space:nowrap;border:1px solid var(--tc);color:var(--tc)}
+/* nav */
+nav.nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--s1);border-top:1px solid var(--line);
+  display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav.nav .in{display:flex;width:100%;max-width:720px}
+nav.nav button{flex:1;padding:9px 0 8px;font-size:11px;color:var(--mu);display:grid;gap:2px;justify-items:center}
+nav.nav button span{font-size:21px;line-height:1}
+nav.nav button.on{color:var(--ac);font-weight:700}
+/* week strip */
+.week{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.dchip{flex:1;min-width:44px;padding:8px 0;border-radius:12px;background:var(--s1);border:1px solid var(--line);font-size:13px;font-weight:700;position:relative;color:var(--tx)}
+.dchip.on{background:var(--dc,var(--s2));border-color:transparent}
+.dchip.today::after{content:"";position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--ac)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:20px}
+.kpi small{color:var(--mu);font-size:11px}
+/* subject */
+.sj-h{display:flex;align-items:center;gap:10px}
+.sj-h .ico{font-size:22px}
+.sj-h h3{font-size:16px;line-height:1.2}
+.topic{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.chk{width:28px;height:28px;border-radius:9px;border:2px solid var(--mu);flex:none;display:grid;place-items:center;font-size:16px;color:transparent}
+.chk.on{background:var(--good);border-color:var(--good);color:#032b1a;font-weight:900}
+.tt{flex:1;min-width:0;font-size:14px;cursor:pointer}
+.tt.done{color:var(--mu)}
+.tt small{display:block;margin-top:3px}
+.acc-h{width:100%;text-align:left}
+.chev{transition:transform .15s;color:var(--mu)}
+.open .chev{transform:rotate(90deg)}
+.seg{display:flex;background:var(--bg);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;padding:8px;border-radius:9px;font-size:13px;font-weight:700;color:var(--mu)}
+.seg button.on{background:var(--s2);color:var(--tx)}
+.wk{display:grid;gap:6px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.wk:first-of-type{border-top:0}
+.note{background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.4);border-radius:12px;padding:10px 12px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-size:13px;font-weight:600}
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(2,8,25,.7);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.sheet-bg[hidden]{display:none}
+.sheet{background:var(--s1);border:1px solid var(--line);border-radius:22px 22px 0 0;width:100%;max-width:720px;max-height:88vh;overflow:auto;padding:12px 16px calc(20px + env(safe-area-inset-bottom));display:grid;gap:12px}
+.grab{width:42px;height:4px;border-radius:4px;background:var(--line);margin:0 auto}
+.sheet h2{font-size:18px}
+.field label{display:block;font-size:13px;color:var(--mu);margin-bottom:5px}
+.step{display:flex;gap:8px}
+.step button{width:48px;border-radius:12px;background:var(--s2);font-size:22px;font-weight:700}
+.step input{text-align:center;font-size:20px;font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pick{display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:12px;text-align:left;width:100%}
+.hist{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.x{color:var(--bad);font-size:18px;padding:4px 8px}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:var(--bg);font-weight:700;border-radius:99px;padding:10px 18px;z-index:50;font-size:14px;max-width:90vw;text-align:center}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--mu);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+svg text{fill:var(--mu);font-size:10px}
+.tip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px 9px;font-size:12px;z-index:3;white-space:nowrap}
+.chartwrap{position:relative}
+.empty{text-align:center;color:var(--mu);padding:14px 6px;font-size:14px}
+.sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<header class="top"><h1>Escrivão <span>PC-PA</span></h1><p id="subtitle">Controle de estudo e questões</p></header>
+<main id="app"></main>
+<nav class="nav" aria-label="Navegação"><div class="in">
+  <button data-act="tab" data-tab="hoje"><span>📅</span>Hoje</button>
+  <button data-act="tab" data-tab="edital"><span>📚</span>Edital</button>
+  <button data-act="tab" data-tab="stats"><span>📊</span>Estatísticas</button>
+  <button data-act="tab" data-tab="plano"><span>🗓️</span>Plano</button>
+  <button data-act="tab" data-tab="mais"><span>⚙️</span>Mais</button>
+</div></nav>
+<div class="sheet-bg" id="sheetBg" hidden><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div></div>
+
+<script>
+/* ============ DADOS DO EDITAL (não reordene: os IDs dependem da posição) ============ */
+const SUBJECTS=[
+{id:'por',n:'Língua Portuguesa',s:'Português',c:'#22c55e',e:'📝',t:[
+'1. Compreensão e interpretação de textos de gêneros variados',
+'2. Reconhecimento de tipos e gêneros textuais',
+'3. Ortografia oficial',
+'4.1 Coesão: referenciação, substituição, repetição e conectores',
+'4.2 Emprego de tempos e modos verbais',
+'5.1 Emprego das classes de palavras',
+'5.2 Coordenação entre orações e entre termos da oração',
+'5.3 Subordinação entre orações e entre termos da oração',
+'5.4 Emprego dos sinais de pontuação',
+'5.5 Concordância verbal e nominal',
+'5.6 Regência verbal e nominal',
+'5.7 Emprego do sinal indicativo de crase',
+'5.8 Colocação dos pronomes átonos',
+'6.1 Significação das palavras',
+'6.2 Substituição de palavras ou de trechos de texto',
+'6.3 Reorganização da estrutura de orações e períodos',
+'6.4 Reescrita de textos: gêneros e níveis de formalidade']},
+{id:'rl',n:'Raciocínio Lógico',s:'Rac. Lógico',c:'#f97316',e:'🧩',t:[
+'1. Estruturas lógicas',
+'2. Lógica de argumentação: analogias, inferências, deduções',
+'3.1 Proposições simples e compostas; valores lógicos',
+'3.2 Conectivos e tabela-verdade',
+'3.3 Proposições equivalentes e Leis de Morgan',
+'4.1 Princípios fundamentais da contagem',
+'4.2 Probabilidade']},
+{id:'inf',n:'Noções de Informática',s:'Informática',c:'#06b6d4',e:'💻',t:[
+'1.1 Organização e arquitetura de computadores',
+'1.2 Componentes de um computador (hardware e software)',
+'1.3 Sistemas de entrada, saída e armazenamento',
+'1.4 Princípios de sistemas operacionais',
+'2.1 Introdução a redes; redes locais, metropolitanas e longa distância',
+'2.2 Terminologia, topologias, modelos OSI/ISO e TCP/IP, protocolos',
+'2.3 Vírus, worms e pragas virtuais',
+'2.4 Aplicativos de segurança (antivírus, firewall, anti-spyware)',
+'3.1 Navegação, correio eletrônico, grupos de discussão, busca e redes sociais',
+'3.2 Acesso remoto, transferência de arquivos, áudio, vídeo e multimídia',
+'3.3 Navegadores (Internet Explorer, Firefox e Chrome)',
+'4.1 Windows 10',
+'4.2 GNU Linux',
+'5.1 Editores de texto (Word e Writer)',
+'5.2 Planilhas (Excel e Calc)',
+'5.3 Apresentações (PowerPoint e Impress)',
+'6. Teoria da informação: dados, informação, conhecimento, segurança e inteligência']},
+{id:'par',n:'Conhecimentos sobre o Estado do Pará',s:'Pará',c:'#84cc16',e:'🌳',t:[
+'1.1 Realidade histórica do Pará',
+'1.2 Realidade geográfica do Pará',
+'1.3 Realidade étnica, social e cultural do Pará',
+'1.4 Realidade política e econômica do Pará',
+'2. Questão agrária, minerária e conflitos territoriais no Pará',
+'3. Regiões Integradas de Segurança Pública (Res. 185/2012 – CONSEP)',
+'4. Constituição do Estado do Pará']},
+{id:'adm',n:'Noções de Direito Administrativo',s:'Administrativo',c:'#eab308',e:'🏛️',t:[
+'1.1 Centralização, descentralização, concentração e desconcentração',
+'1.2 Administração direta e indireta',
+'1.3 Autarquias, fundações, empresas públicas e sociedades de economia mista',
+'2.1 Ato administrativo: conceito, requisitos e atributos',
+'2.2 Ato administrativo: classificação e espécies',
+'3.1 Agente público e disposições constitucionais aplicáveis',
+'3.2 Lei Orgânica da Polícia Civil do Pará (LC 022/1994)',
+'3.3 Regime Jurídico Único dos Servidores do Pará (Lei 5.810/1994)',
+'4.1 Poderes: hierárquico, disciplinar, regulamentar e de polícia',
+'4.2 Uso e abuso do poder',
+'5.1 Licitações (Lei 8.666/93): princípios',
+'5.2 Contratação direta, dispensa e inexigibilidade',
+'5.3 Modalidades, tipos e procedimentos',
+'6. Controle da administração: judicial e legislativo',
+'7.1 Responsabilidade civil do Estado: ato comissivo e omissão',
+'7.2 Requisitos, excludentes e atenuantes da responsabilidade do Estado',
+'8. Lei Estadual 8.972/2020 (processo administrativo do Pará)']},
+{id:'con',n:'Noções de Direito Constitucional',s:'Constitucional',c:'#14b8a6',e:'📜',t:[
+'1.1 Direitos e deveres individuais e coletivos (vida, liberdade, igualdade, segurança, propriedade)',
+'1.2 Direitos sociais',
+'1.3 Nacionalidade',
+'1.4 Cidadania, direitos políticos e partidos políticos',
+'1.5 Garantias constitucionais individuais, coletivas, sociais e políticas',
+'2. Administração Pública',
+'3. Poder Executivo: forma e sistema de governo; chefia de Estado e de governo',
+'4. Defesa do Estado e das instituições democráticas; segurança pública',
+'5.1 Ordem social: base, objetivos e seguridade social',
+'5.2 Meio ambiente',
+'5.3 Família, criança, adolescente, idoso e índio']},
+{id:'pen',n:'Noções de Direito Penal',s:'Penal',c:'#3b82f6',e:'⚖️',t:[
+'1. Princípios básicos do Direito Penal',
+'2.1 Lei penal no tempo: tempo do crime, irretroatividade, lei excepcional e temporária',
+'2.2 Lei penal no espaço e lugar do crime',
+'2.3 Contagem de prazo',
+'3.1 Conceito analítico de crime (típico, ilícito e culpável)',
+'3.2 Crime consumado e tentado',
+'3.3 Ilicitude, causas de exclusão e excesso punível',
+'4. Concurso de pessoas',
+'5.1 Crimes contra a pessoa: contra a vida',
+'5.2 Crimes contra a pessoa: lesão corporal e periclitação da vida',
+'5.3 Crimes contra a pessoa: honra e liberdade individual',
+'6.1 Crimes contra o patrimônio: furto',
+'6.2 Crimes contra o patrimônio: roubo e extorsão',
+'6.3 Crimes contra o patrimônio: apropriação, estelionato, receptação e demais',
+'7.1 Crimes contra a administração pública: praticados por funcionário público',
+'7.2 Crimes contra a administração pública: praticados por particular',
+'8. Disposições constitucionais aplicáveis ao Direito Penal']},
+{id:'pp',n:'Noções de Direito Processual Penal',s:'Proc. Penal',c:'#a855f7',e:'🔨',t:[
+'1. Disposições preliminares do CPP',
+'2.1 Inquérito policial: conceito, natureza, finalidade, características e titularidade',
+'2.2 Inquérito policial: instauração, notitia criminis, delatio criminis e procedimentos investigativos',
+'2.3 Inquérito policial: indiciamento, garantias do investigado, valor probatório e conclusão',
+'3. Ação penal',
+'4. Competência',
+'5. Prova',
+'6. Citações e intimações',
+'7.1 Prisão em flagrante e demais espécies de prisão',
+'7.2 Liberdade provisória, fiança e medidas cautelares',
+'8. Disposições constitucionais aplicáveis ao Processo Penal',
+'9. Lei 9.099/1995 (Juizados Especiais)']},
+{id:'esp',n:'Legislação Especial',s:'Leg. Especial',c:'#ec4899',e:'🚨',t:[
+'1. Abuso de Autoridade (Lei 13.869/2019)',
+'2. Drogas (Lei 11.343/2006)',
+'3. Interceptação telefônica (Lei 9.296/1996)',
+'4. Organizações criminosas (Lei 12.850/2013)',
+'5. Proteção à testemunha e delação premiada (Lei 9.807/1999)',
+'6. Tortura (Lei 9.455/1997)',
+'7. Armas e SINARM (Lei 10.826/2003)',
+'8. Crimes contra crianças e adolescentes (Lei 8.069/1990)',
+'9. Crimes de preconceito de raça ou de cor (Lei 7.716/1989)',
+'10. Lavagem de dinheiro (Lei 9.613/1998)',
+'11. Violência doméstica – Maria da Penha (Lei 11.340/2006)']},
+{id:'arq',n:'Arquivologia',s:'Arquivologia',c:'#94a3b8',e:'🗄️',t:[
+'1. Arquivística: princípios e conceitos',
+'2.1 Gestão da informação e de documentos; protocolo',
+'2.2 Classificação de documentos de arquivo',
+'2.3 Arquivamento e ordenação',
+'2.4 Tabela de temporalidade',
+'3. Acondicionamento e armazenamento',
+'4. Preservação e conservação',
+'5. Tipologias documentais e suportes físicos (microfilmagem, automação, restauração)']},
+{id:'est',n:'Noções de Estatística',s:'Estatística',c:'#818cf8',e:'📊',t:[
+'1.1 Estatística descritiva: gráficos, diagramas e tabelas',
+'1.2 Medidas de posição',
+'1.3 Medidas de dispersão',
+'1.4 Assimetria e curtose',
+'2. Probabilidade: definições básicas e axiomas',
+'3. Probabilidade condicional e independência']}
+];
+const SJ={},TP={},ALL=[];
+SUBJECTS.forEach(s=>{SJ[s.id]=s;s.t.forEach((title,i)=>{const id=s.id+'.'+i;TP[id]={id,sid:s.id,title};ALL.push(TP[id]);});});
+const DAYS=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const DS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DCOL=['#11958f','#1f6bff','#2fb344','#7a3fd1','#11958f','#ff7a00','#7a3fd1'];
+const ORDER=[1,2,3,4,5,6,0];
+
+/* ============ UTIL ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const ymd=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fmtD=s=>{const [,m,d]=s.split('-');return `${d}/${m}`};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const pctOf=(h,n)=>n?Math.round(h/n*100):null;
+
+/* ============ ESTADO ============ */
+const KEY='escrivao-pa-v1';
+const defState=()=>({v:1,topics:{},sessions:[],schedule:{1:['pen'],2:['por'],3:['pp'],4:['con','adm'],5:['rl','inf']},settings:{goal:75,minQ:5,lastBackup:null}});
+let S;
+function normalize(o){
+  const d=defState(); if(!o||typeof o!=='object')return d;
+  if(o.topics&&typeof o.topics==='object')for(const[k,v]of Object.entries(o.topics))if(TP[k]&&v&&typeof v==='object')d.topics[k]={done:typeof v.done==='string'?v.done:null,rev:Array.isArray(v.rev)?v.rev.filter(x=>typeof x==='string'):[]};
+  if(Array.isArray(o.sessions))d.sessions=o.sessions.filter(x=>x&&SJ[x.s]&&typeof x.d==='string'&&Number.isFinite(+x.h)&&Number.isFinite(+x.e)).map(x=>({id:String(x.id||uid()),d:x.d,s:x.s,t:x.t&&TP[x.t]?x.t:null,h:Math.max(0,+x.h|0),e:Math.max(0,+x.e|0),k:x.k==='sim'?'sim':'q',g:x.g?String(x.g):null}));
+  if(o.schedule&&typeof o.schedule==='object'){const sc={};for(let i=1;i<=5;i++)sc[i]=Array.isArray(o.schedule[i])?[...new Set(o.schedule[i].filter(s=>SJ[s]))]:[];d.schedule=sc;}
+  if(o.settings&&typeof o.settings==='object'){d.settings.goal=clamp(+o.settings.goal||75,1,100);d.settings.minQ=clamp(+o.settings.minQ||5,1,50);d.settings.lastBackup=typeof o.settings.lastBackup==='string'?o.settings.lastBackup:null;}
+  return d;
+}
+function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return}}catch(e){}S=defState()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('⚠️ Não foi possível salvar neste navegador')}}
+
+/* ============ ESTATÍSTICAS ============ */
+let ST;
+function compute(){
+  const T={},J={};
+  ALL.forEach(t=>T[t.id]={n:0,h:0,e:0,done:!!(S.topics[t.id]&&S.topics[t.id].done)});
+  SUBJECTS.forEach(s=>J[s.id]={n:0,h:0,e:0,total:s.t.length,done:0});
+  ALL.forEach(t=>{if(T[t.id].done)J[t.sid].done++});
+  S.sessions.forEach(x=>{const j=J[x.s];j.h+=x.h;j.e+=x.e;j.n+=x.h+x.e;if(x.t&&T[x.t]){const t=T[x.t];t.h+=x.h;t.e+=x.e;t.n+=x.h+x.e}});
+  const tot={n:0,h:0,e:0,done:0,total:ALL.length};
+  SUBJECTS.forEach(s=>{tot.n+=J[s.id].n;tot.h+=J[s.id].h;tot.e+=J[s.id].e;tot.done+=J[s.id].done});
+  return{T,J,tot};
+}
+const isComplete=sid=>ST?ST.J[sid].done===ST.J[sid].total:SJ[sid].t.every((_,i)=>S.topics[sid+'.'+i]&&S.topics[sid+'.'+i].done);
+function tier(p,n){if(!n)return'none';if(p<50)return'bad';if(p<S.settings.goal)return'mid';return'good'}
+const TL={bad:'Crítico',mid:'Atenção',good:'Na meta',none:'Sem questões'};
+function badge(h,e){const n=h+e;if(!n)return'<span class="bd none">sem questões</span>';const p=pctOf(h,n);return`<span class="bd ${tier(p,n)}">${p}% · ${h}✓ ${e}✗</span>`}
+function bar(p,t,goal){return`<div class="bar ${t}"><i style="width:${p||0}%"></i>${goal?`<b style="left:${S.settings.goal}%"></b>`:''}</div>`}
+function activityDates(){
+  const s=new Set();S.sessions.forEach(x=>s.add(x.d));
+  Object.values(S.topics).forEach(t=>{if(t.done)s.add(t.done);t.rev.forEach(r=>s.add(r))});return s;
+}
+function streak(){
+  const a=activityDates();let d=new Date();if(!a.has(ymd(d)))d.setDate(d.getDate()-1);
+  let n=0;while(a.has(ymd(d))){n++;d.setDate(d.getDate()-1)}return n;
+}
+const scheduledIds=()=>new Set([].concat(...[1,2,3,4,5].map(d=>S.schedule[d])));
+
+/* ============ VIEW STATE ============ */
+const view={tab:'hoje',day:new Date().getDay(),open:new Set(),q:'',filter:'all',weak:'pct'};
+let deferredPrompt=null;
+
+function render(keep=true){
+  ST=compute();const y=scrollY;
+  const f={hoje:vHoje,edital:vEdital,stats:vStats,plano:vPlano,mais:vMais}[view.tab];
+  $('#app').innerHTML=f();
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===view.tab));
+  $('#subtitle').textContent={hoje:'Seu plano de hoje',edital:'Marque os tópicos e registre questões',stats:'Onde você está forte e onde precisa melhorar',plano:'Cronograma semanal',mais:'Backup, metas e instalação'}[view.tab];
+  if(keep)scrollTo(0,y);
+}
+
+/* ============ COMPONENTES ============ */
+function topicRow(t,opt={}){
+  const st=ST.T[t.id];const done=st.done;
+  return`<div class="topic">
+    <button class="chk ${done?'on':''}" data-act="toggle" data-id="${t.id}" aria-label="${done?'Desmarcar':'Marcar'} como estudado: ${esc(t.title)}" aria-pressed="${done}">✓</button>
+    <div class="tt ${done?'done':''}" data-act="detail" data-id="${t.id}">${opt.showSubj?`<span class="dot" style="background:${SJ[t.sid].c};display:inline-block;margin-right:6px"></span>`:''}${esc(t.title)}<small>${badge(st.h,st.e)}</small></div>
+    <button class="mini" data-act="logq" data-id="${t.id}">+ Questões</button>
+  </div>`;
+}
+function subjCard(sid,{next=3}={}){
+  const s=SJ[sid],j=ST.J[sid],p=Math.round(j.done/j.total*100),comp=j.done===j.total;
+  const pending=ALL.filter(t=>t.sid===sid&&!ST.T[t.id].done).slice(0,next);
+  const acc=pctOf(j.h,j.n);
+  return`<section class="card"><div class="sj-h"><span class="ico">${s.e}</span><div class="grow"><h3>${esc(s.n)}</h3>
+    <div class="sub">${j.done}/${j.total} tópicos · ${j.n} questões ${acc!==null?`· ${acc}% acerto`:''}</div></div>
+    <button class="mini" data-act="goto" data-id="${sid}">Edital</button></div>
+    <div style="margin:10px 0 4px">${bar(p,comp?'good':'mid')}</div>
+    ${comp?`<div class="note" style="margin-top:8px">🎉 Matéria concluída! No domingo ela vira só questões. <button class="mini" data-act="complete" data-id="${sid}">Trocar no cronograma</button></div>`:
+    `<div class="sub" style="margin-top:8px">Próximos tópicos:</div>${pending.map(t=>topicRow(t)).join('')}`}
+  </section>`;
+}
+function weekStrip(){
+  const today=new Date().getDay();
+  return`<div class="week">${ORDER.map(d=>`<button class="dchip ${view.day===d?'on':''} ${today===d?'today':''}" style="--dc:${DCOL[d]}" data-act="day" data-d="${d}">${DS[d]}</button>`).join('')}</div>`;
+}
+function sortWeak(list){ // piores primeiro; sem questões no meio
+  const rank=t=>{const s=ST.T[t.id];return s.n?pctOf(s.h,s.n):60};
+  return list.slice().sort((a,b)=>rank(a)-rank(b));
+}
+
+/* ============ HOJE ============ */
+function vHoje(){
+  const d=view.day,today=ymd();
+  const qToday=S.sessions.filter(x=>x.d===today).reduce((a,x)=>a+x.h+x.e,0);
+  let h=`<div class="kpis"><div class="kpi"><b>${qToday}</b><small>questões hoje</small></div><div class="kpi"><b>${streak()}</b><small>dias seguidos</small></div><div class="kpi"><b>${Math.round(ST.tot.done/ST.tot.total*100)}%</b><small>do edital</small></div></div>${weekStrip()}`;
+  if(S.sessions.length>20&&(!S.settings.lastBackup||(Date.now()-new Date(S.settings.lastBackup))/864e5>14))
+    h+=`<div class="note">💾 Faz mais de 14 dias sem backup. <button class="mini" data-act="tab" data-tab="mais">Fazer backup</button></div>`;
+  if(d>=1&&d<=5){
+    const ids=S.schedule[d];
+    h+=`<div class="sub">${DAYS[d]} · ${ids.length?ids.map(i=>SJ[i].s).join(' + '):'sem matérias'}</div>`;
+    h+=ids.length?ids.map(i=>subjCard(i)).join(''):`<div class="card empty">Nenhuma matéria neste dia.<br><button class="btn" style="margin-top:10px" data-act="tab" data-tab="plano">Editar cronograma</button></div>`;
+  }else if(d===6){
+    const pool=ALL.filter(t=>ST.T[t.id].done);
+    const lastRev=t=>{const r=S.topics[t.id].rev;return r.length?r[r.length-1]:'0000'};
+    const list=pool.slice().sort((a,b)=>{const ra=ST.T[a.id],rb=ST.T[b.id];const wa=ra.n&&pctOf(ra.h,ra.n)<S.settings.goal?0:1,wb=rb.n&&pctOf(rb.h,rb.n)<S.settings.goal?0:1;return wa-wb||lastRev(a).localeCompare(lastRev(b))}).slice(0,8);
+    h+=`<section class="card"><h2>🔁 Revisão</h2><p class="sub">Tópicos já estudados – os mais fracos e há mais tempo sem revisar vêm primeiro.</p>
+    ${list.length?list.map(t=>{const r=S.topics[t.id].rev;return`<div class="topic"><div class="tt">${esc(t.title)}<small>${badge(ST.T[t.id].h,ST.T[t.id].e)} <span class="sub">${SJ[t.sid].s} · ${r.length?'revisado '+fmtD(r[r.length-1]):'nunca revisado'}</span></small></div><button class="mini" data-act="rev" data-id="${t.id}">Revisei ✓</button></div>`}).join(''):'<div class="empty">Marque tópicos como estudados para eles aparecerem aqui.</div>'}</section>`;
+    const sims={};S.sessions.filter(x=>x.k==='sim').forEach(x=>{const g=x.g||x.d;(sims[g]=sims[g]||{d:x.d,h:0,e:0}).h+=x.h;sims[g].e+=x.e});
+    const sl=Object.values(sims).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,5);
+    h+=`<section class="card"><h2>📝 Simulado</h2><button class="btn full" data-act="sim">Registrar simulado</button>
+    ${sl.map(x=>`<div class="hist"><span class="grow">${fmtD(x.d)}</span><span class="sub">${x.h+x.e} questões</span>${badge(x.h,x.e)}</div>`).join('')}</section>`;
+  }else{
+    const done=SUBJECTS.filter(s=>ST.J[s.id].done===ST.J[s.id].total);
+    const use=done.length?done:SUBJECTS.filter(s=>ST.J[s.id].done>0);
+    h+=`<div class="note">${done.length?'✅ Domingo é só questões das matérias que você já concluiu.':'Você ainda não concluiu nenhuma matéria. Fazendo questões dos tópicos já estudados:'}</div>`;
+    if(!use.length)h+=`<div class="card empty">Marque tópicos como estudados no Edital para eles aparecerem aqui.</div>`;
+    use.forEach(s=>{
+      const list=sortWeak(ALL.filter(t=>t.sid===s.id&&(done.length||ST.T[t.id].done))).slice(0,6);
+      h+=`<section class="card"><div class="sj-h"><span class="ico">${s.e}</span><div class="grow"><h3>${esc(s.n)}</h3><div class="sub">${ST.J[s.id].n} questões · ${pctOf(ST.J[s.id].h,ST.J[s.id].n)??'–'}${ST.J[s.id].n?'%':''}</div></div><button class="mini" data-act="goto" data-id="${s.id}">Ver todos</button></div>${list.map(t=>topicRow(t)).join('')}</section>`;
+    });
+  }
+  return h;
+}
+
+/* ============ EDITAL ============ */
+function vEdital(){
+  return`<input id="search" type="search" placeholder="Buscar tópico…" value="${esc(view.q)}" aria-label="Buscar tópico">
+  <div class="seg" role="tablist">${[['all','Todos'],['todo','Pendentes'],['done','Estudados'],['weak','Fracos']].map(([k,l])=>`<button class="${view.filter===k?'on':''}" data-act="filter" data-f="${k}">${l}</button>`).join('')}</div>
+  <div id="edList" style="display:grid;gap:14px">${edList()}</div>`;
+}
+function edList(){
+  const q=view.q.trim().toLowerCase();let any=false;
+  const out=SUBJECTS.map(s=>{
+    let ts=ALL.filter(t=>t.sid===s.id);
+    if(q)ts=ts.filter(t=>(t.title+' '+s.n).toLowerCase().includes(q));
+    if(view.filter==='todo')ts=ts.filter(t=>!ST.T[t.id].done);
+    if(view.filter==='done')ts=ts.filter(t=>ST.T[t.id].done);
+    if(view.filter==='weak')ts=ts.filter(t=>{const x=ST.T[t.id];return x.n&&pctOf(x.h,x.n)<S.settings.goal});
+    if(!ts.length&&(q||view.filter!=='all'))return'';
+    any=true;
+    const j=ST.J[s.id],p=Math.round(j.done/j.total*100),open=view.open.has(s.id)||!!q||view.filter!=='all';
+    return`<section class="card ${open?'open':''}" id="sj-${s.id}"><button class="acc-h" data-act="acc" data-id="${s.id}"><div class="sj-h"><span class="ico">${s.e}</span><div class="grow"><h3>${esc(s.n)}</h3><div class="sub">${j.done}/${j.total} tópicos · ${j.n} questões</div></div>${badge(j.h,j.e)}<span class="chev">▶</span></div><div style="margin-top:10px">${bar(p,j.done===j.total?'good':'mid')}</div></button>
+    ${open?`<div style="margin-top:8px">${ts.map(t=>topicRow(t)).join('')}</div>`:''}</section>`;
+  }).join('');
+  return any?out:'<div class="card empty">Nenhum tópico encontrado.</div>';
+}
+
+/* ============ ESTATÍSTICAS ============ */
+function chart14(){
+  const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(ymd(d))}
+  const data=days.map(d=>{let h=0,e=0;S.sessions.forEach(x=>{if(x.d===d){h+=x.h;e+=x.e}});return{d,h,e}});
+  const max=Math.max(10,...data.map(x=>x.h+x.e)),W=336,H=150,pl=26,pb=20,pt=8,bw=15,gap=(W-pl-14*bw)/13;
+  const ch=H-pb-pt;
+  let g='';[0,.5,1].forEach(f=>{const y=pt+ch*(1-f);g+=`<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${pl-4}" y="${y+3}" text-anchor="end">${Math.round(max*f)}</text>`});
+  data.forEach((x,i)=>{
+    const X=pl+i*(bw+gap),hh=x.h/max*ch,eh=x.e/max*ch,yb=pt+ch;
+    if(x.h)g+=`<rect x="${X}" y="${yb-hh}" width="${bw}" height="${Math.max(hh,1)}" rx="3" fill="var(--hit)"/>`;
+    if(x.e)g+=`<rect x="${X}" y="${yb-hh-eh-(x.h?2:0)}" width="${bw}" height="${eh}" rx="3" fill="var(--err)"/>`;
+    g+=`<rect class="hit" data-i="${i}" x="${X-2}" y="0" width="${bw+4}" height="${H-pb}" fill="transparent"/>`;
+    if(i%2===1||i===13)g+=`<text x="${X+bw/2}" y="${H-5}" text-anchor="middle">${x.d.slice(8)}</text>`;
+  });
+  const total=data.reduce((a,x)=>a+x.h+x.e,0);
+  window._c14=data;
+  return`<div class="chartwrap" id="c14"><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Questões por dia nos últimos 14 dias: acertos e erros. Total ${total}.">${g}</svg></div>
+  <div class="legend"><span><i style="background:var(--hit)"></i>Acertos</span><span><i style="background:var(--err)"></i>Erros</span><span style="margin-left:auto">${(total/14).toFixed(1).replace('.',',')} questões/dia</span></div>`;
+}
+function vStats(){
+  const{tot}=ST,acc=pctOf(tot.h,tot.n),goal=S.settings.goal;
+  let h=`<div class="kpis" style="grid-template-columns:repeat(2,1fr)">
+    <div class="kpi"><b>${Math.round(tot.done/tot.total*100)}%</b><small>edital estudado (${tot.done}/${tot.total})</small></div>
+    <div class="kpi"><b>${tot.n}</b><small>questões (${tot.h}✓ ${tot.e}✗)</small></div>
+    <div class="kpi"><b style="color:var(--${tier(acc,tot.n)==='none'?'mu':tier(acc,tot.n)})">${acc===null?'–':acc+'%'}</b><small>aproveitamento · meta ${goal}%</small></div>
+    <div class="kpi"><b>${streak()}</b><small>dias seguidos</small></div></div>`;
+  h+=`<section class="card"><h2>Questões nos últimos 14 dias</h2>${chart14()}</section>`;
+  const minQ=S.settings.minQ;
+  let list=ALL.filter(t=>ST.T[t.id].n>=minQ);
+  if(view.weak==='pct')list.sort((a,b)=>pctOf(ST.T[a.id].h,ST.T[a.id].n)-pctOf(ST.T[b.id].h,ST.T[b.id].n)||ST.T[b.id].e-ST.T[a.id].e);
+  else list=ALL.filter(t=>ST.T[t.id].e>0).sort((a,b)=>ST.T[b.id].e-ST.T[a.id].e);
+  list=list.slice(0,8);
+  h+=`<section class="card"><h2>🎯 Onde você tem dificuldade</h2>
+  <div class="seg" style="margin-bottom:6px"><button class="${view.weak==='pct'?'on':''}" data-act="weak" data-w="pct">Menor % de acerto</button><button class="${view.weak==='err'?'on':''}" data-act="weak" data-w="err">Mais erros</button></div>
+  ${list.length?list.map(t=>{const x=ST.T[t.id],p=pctOf(x.h,x.n),tr=tier(p,x.n);return`<div class="wk" data-act="detail" data-id="${t.id}"><div class="row"><span class="dot" style="background:${SJ[t.sid].c}"></span><div class="grow" style="font-size:14px">${esc(t.title)}<div class="sub">${SJ[t.sid].s}</div></div><span class="bd ${tr}">${TL[tr]}</span></div>${bar(p,tr)}<div class="sub">${p}% de acerto · ${x.h} acertos · ${x.e} erros (${x.n} questões)</div></div>`}).join(''):
+  `<div class="empty">${view.weak==='pct'?`Registre pelo menos <b>${minQ} questões</b> em um tópico para ele entrar no ranking.`:'Nenhum erro registrado ainda.'}</div>`}</section>`;
+  const nq=sortWeak(ALL.filter(t=>ST.T[t.id].done&&!ST.T[t.id].n)).slice(0,8);
+  if(nq.length)h+=`<section class="card"><h2>⚠️ Estudou, mas ainda sem questões</h2><p class="sub">Questões são o que fixa o conteúdo. Comece por aqui:</p>${nq.map(t=>topicRow(t,{showSubj:true})).join('')}</section>`;
+  h+=`<section class="card"><h2>Por matéria</h2>${SUBJECTS.map(s=>{const j=ST.J[s.id],p=pctOf(j.h,j.n),tr=tier(p,j.n);return`<div class="wk" data-act="goto" data-id="${s.id}"><div class="row"><span class="dot" style="background:${s.c}"></span><div class="grow" style="font-size:14px;font-weight:600">${esc(s.s)}</div><span class="sub">${j.done}/${j.total} tópicos</span>${j.n?`<span class="bd ${tr}">${p}%</span>`:'<span class="bd none">–</span>'}</div>${bar(p||0,tr,true)}<div class="sub">${j.n} questões · ${j.h} acertos · ${j.e} erros</div></div>`}).join('')}
+  <p class="sub" style="margin-top:6px">A linha branca marca sua meta de ${goal}%.</p></section>`;
+  return h;
+}
+
+/* ============ PLANO ============ */
+function vPlano(){
+  const sched=scheduledIds();
+  let h=`<div class="note">Segunda a sexta: matérias novas do edital. Sábado: revisão + simulado. Domingo: só questões das matérias concluídas. Ao concluir uma matéria, o app oferece trocar o espaço dela por outra.</div>`;
+  h+=[1,2,3,4,5].map(d=>`<section class="card" style="border-left:5px solid ${DCOL[d]}"><h2>${DAYS[d]}</h2><div class="chips">${S.schedule[d].map((sid,i)=>`<button class="chip" data-act="slot" data-d="${d}" data-i="${i}"><span class="dot" style="background:${SJ[sid].c}"></span>${SJ[sid].s}${isComplete(sid)?' ✅':''}</button>`).join('')}<button class="chip" data-act="slot" data-d="${d}" data-i="-1">＋ matéria</button></div></section>`).join('');
+  h+=`<section class="card" style="border-left:5px solid ${DCOL[6]}"><h2>Sábado</h2><p class="sub">Revisão + simulado</p></section><section class="card" style="border-left:5px solid ${DCOL[0]}"><h2>Domingo</h2><p class="sub">Só questões${SUBJECTS.some(s=>isComplete(s.id))?' de: '+SUBJECTS.filter(s=>isComplete(s.id)).map(s=>s.s).join(', '):' (nenhuma matéria concluída ainda)'}</p></section>`;
+  const fila=SUBJECTS.filter(s=>!sched.has(s.id)&&!isComplete(s.id));
+  h+=`<section class="card"><h2>Fila de espera</h2><p class="sub" style="margin-bottom:8px">Matérias que ainda não entraram no cronograma:</p><div class="chips">${fila.length?fila.map(s=>`<span class="chip"><span class="dot" style="background:${s.c}"></span>${s.s} · ${ST.J[s.id].done}/${ST.J[s.id].total}</span>`).join(''):'<span class="sub">Todas as matérias já estão no cronograma ou concluídas.</span>'}</div></section>`;
+  const conc=SUBJECTS.filter(s=>isComplete(s.id));
+  h+=`<section class="card"><h2>Concluídas ✅</h2><div class="chips">${conc.length?conc.map(s=>`<span class="chip"><span class="dot" style="background:${s.c}"></span>${s.s}</span>`).join(''):'<span class="sub">Nenhuma ainda. Bora!</span>'}</div></section>`;
+  h+=`<button class="btn ghost full" data-act="resetplan">Restaurar cronograma original</button>`;
+  return h;
+}
+
+/* ============ MAIS ============ */
+function vMais(){
+  const lb=S.settings.lastBackup;
+  return`<section class="card"><h2>Metas</h2><div class="two"><div class="field"><label for="goal">Meta de acertos (%)</label><input id="goal" type="number" inputmode="numeric" min="1" max="100" value="${S.settings.goal}"></div>
+  <div class="field"><label for="minq">Mín. de questões p/ ranking</label><input id="minq" type="number" inputmode="numeric" min="1" max="50" value="${S.settings.minQ}"></div></div></section>
+  <section class="card"><h2>💾 Backup</h2><p class="sub" style="margin-bottom:10px">Seus dados ficam só neste aparelho. Se limpar os dados do navegador ou trocar de celular, você perde tudo — faça backup de vez em quando. Último: ${lb?new Date(lb).toLocaleDateString('pt-BR'):'nunca'}.</p>
+  <div class="two"><button class="btn" data-act="export">Exportar</button><button class="btn sec" data-act="import">Importar</button></div><input id="file" type="file" accept="application/json,.json" hidden></section>
+  <section class="card"><h2>📲 Instalar no celular</h2>
+  ${deferredPrompt?`<button class="btn full" data-act="install" style="margin-bottom:10px">Instalar app</button>`:''}
+  <p class="sub"><b>Android (Chrome):</b> menu ⋮ → <i>Instalar app</i> / <i>Adicionar à tela inicial</i>.<br><b>iPhone (Safari):</b> botão Compartilhar → <i>Adicionar à Tela de Início</i>.<br>Depois de instalado, funciona offline.</p></section>
+  <section class="card"><h2>Zona de perigo</h2><button class="btn danger full" data-act="wipe">Apagar todos os dados</button></section>`;
+}
+
+/* ============ SHEETS ============ */
+function openSheet(html){$('#sheetBody').innerHTML=html;$('#sheetBg').hidden=false}
+function closeSheet(){$('#sheetBg').hidden=true;$('#sheetBody').innerHTML=''}
+let _t;function toast(m){document.querySelector('.toast')?.remove();const e=document.createElement('div');e.className='toast';e.textContent=m;document.body.appendChild(e);clearTimeout(_t);_t=setTimeout(()=>e.remove(),2400)}
+
+function stepper(id,label,val=0){return`<div class="field"><label for="${id}">${label}</label><div class="step"><button type="button" data-act="step" data-f="${id}" data-v="-1" aria-label="menos">−</button><input id="${id}" type="number" inputmode="numeric" min="0" value="${val}"><button type="button" data-act="step" data-f="${id}" data-v="1" aria-label="mais">+</button></div></div>`}
+function openLog(tid){
+  const t=TP[tid];
+  openSheet(`<h2>Registrar questões</h2><div class="sub">${SJ[t.sid].e} ${esc(SJ[t.sid].s)} · ${esc(t.title)}</div>
+  <div class="two">${stepper('fh','✅ Acertos')}${stepper('fe','❌ Erros')}</div>
+  <div id="live" class="sub" style="text-align:center">Total: 0</div>
+  <div class="field"><label for="fd">Data</label><input id="fd" type="date" value="${ymd()}"></div>
+  ${ST.T[tid].done?'':`<label class="row" style="font-size:14px"><input id="fdone" type="checkbox" checked style="width:22px;height:22px"> Marcar tópico como estudado</label>`}
+  <button class="btn full" data-act="savelog" data-id="${tid}">Salvar</button><button class="btn ghost full" data-act="close">Cancelar</button>`);
+  setTimeout(()=>$('#fh').focus(),50);
+}
+function liveUpd(){const h=+$('#fh')?.value||0,e=+$('#fe')?.value||0,n=h+e;if($('#live'))$('#live').textContent=n?`Total: ${n} · ${pctOf(h,n)}% de acerto`:'Total: 0'}
+function saveLog(tid){
+  const h=Math.max(0,+$('#fh').value|0),e=Math.max(0,+$('#fe').value|0);
+  if(h+e<=0){toast('Informe acertos ou erros');return}
+  S.sessions.push({id:uid(),d:$('#fd').value||ymd(),s:TP[tid].sid,t:tid,h,e,k:'q',g:null});
+  let comp=false;
+  if($('#fdone')?.checked){const was=isComplete(TP[tid].sid);markDone(tid,true);ST=compute();comp=!was&&isComplete(TP[tid].sid)}
+  save();closeSheet();render();toast(`Registrado: ${h} acertos, ${e} erros`);
+  if(comp)setTimeout(()=>openComplete(TP[tid].sid),400);
+}
+function markDone(tid,v){const t=S.topics[tid]||(S.topics[tid]={done:null,rev:[]});t.done=v?ymd():null}
+function toggleDone(tid){
+  const sid=TP[tid].sid,was=isComplete(sid);
+  markDone(tid,!(S.topics[tid]&&S.topics[tid].done));save();render();
+  if(!was&&isComplete(sid))openComplete(sid);
+}
+function openDetail(tid){
+  const t=TP[tid],st=ST.T[tid],ss=S.sessions.filter(x=>x.t===tid).sort((a,b)=>b.d.localeCompare(a.d)),rv=(S.topics[tid]||{rev:[]}).rev;
+  openSheet(`<h2 style="font-size:16px">${esc(t.title)}</h2><div class="sub">${SJ[t.sid].e} ${esc(SJ[t.sid].n)}</div>
+  <div class="kpis"><div class="kpi"><b>${st.n}</b><small>questões</small></div><div class="kpi"><b style="color:var(--good)">${st.h}</b><small>acertos</small></div><div class="kpi"><b style="color:var(--bad)">${st.e}</b><small>erros</small></div></div>
+  ${st.n?`<div>${bar(pctOf(st.h,st.n),tier(pctOf(st.h,st.n),st.n),true)}<div class="sub" style="margin-top:6px">${pctOf(st.h,st.n)}% de acerto · ${TL[tier(pctOf(st.h,st.n),st.n)]}</div></div>`:''}
+  <div class="two"><button class="btn" data-act="logq" data-id="${tid}">+ Questões</button><button class="btn sec" data-act="toggle" data-id="${tid}" data-close="1">${st.done?'Desmarcar estudado':'Marcar estudado'}</button></div>
+  ${st.done?`<div class="sub">Estudado em ${fmtD(S.topics[tid].done)} · ${rv.length} revisões${rv.length?' (última '+fmtD(rv[rv.length-1])+')':''}</div>`:''}
+  ${ss.length?`<div><h2 style="font-size:14px">Histórico</h2>${ss.map(x=>`<div class="hist"><span class="grow">${fmtD(x.d)}</span><span>${x.h}✓ ${x.e}✗</span><button class="x" data-act="delsess" data-id="${x.id}" data-t="${tid}" aria-label="Excluir registro">🗑</button></div>`).join('')}</div>`:''}
+  <button class="btn ghost full" data-act="close">Fechar</button>`);
+}
+function openSim(){
+  openSheet(`<h2>Registrar simulado</h2><p class="sub">Preencha só as matérias que apareceram.</p>
+  <div class="field"><label for="fd">Data</label><input id="fd" type="date" value="${ymd()}"></div>
+  ${SUBJECTS.map(s=>`<div class="row"><span class="dot" style="background:${s.c}"></span><div class="grow" style="font-size:14px">${esc(s.s)}</div><input class="sh" data-s="${s.id}" type="number" inputmode="numeric" min="0" placeholder="✓" style="width:68px" aria-label="Acertos ${esc(s.s)}"><input class="se" data-s="${s.id}" type="number" inputmode="numeric" min="0" placeholder="✗" style="width:68px" aria-label="Erros ${esc(s.s)}"></div>`).join('')}
+  <button class="btn full" data-act="savesim">Salvar simulado</button><button class="btn ghost full" data-act="close">Cancelar</button>`);
+}
+function saveSim(){
+  const g=uid(),d=$('#fd').value||ymd();let n=0;
+  document.querySelectorAll('.sh').forEach(i=>{const s=i.dataset.s,h=Math.max(0,+i.value|0),e=Math.max(0,+document.querySelector(`.se[data-s="${s}"]`).value|0);if(h+e){S.sessions.push({id:uid(),d,s,t:null,h,e,k:'sim',g});n+=h+e}});
+  if(!n){toast('Preencha ao menos uma matéria');return}
+  save();closeSheet();render();toast(`Simulado salvo: ${n} questões`);
+}
+function openComplete(sid){
+  const s=SJ[sid],days=[1,2,3,4,5].filter(d=>S.schedule[d].includes(sid));
+  const used=scheduledIds();
+  const cands=SUBJECTS.filter(x=>!isComplete(x.id)&&!used.has(x.id));
+  let body=`<h2>🎉 ${esc(s.n)} concluída!</h2><p class="sub">A partir de agora ela entra nas questões de domingo.</p>`;
+  if(days.length){
+    body+=`<p>Qual matéria entra no lugar dela (${days.map(d=>DAYS[d]).join(', ')})?</p>`;
+    body+=cands.length?cands.map(c=>`<button class="pick" data-act="replace" data-from="${sid}" data-to="${c.id}"><span class="dot" style="background:${c.c}"></span><span class="grow">${c.e} ${esc(c.n)}</span><span class="sub">${ST.J[c.id].done}/${ST.J[c.id].total}</span></button>`).join(''):'<div class="note">Todas as outras matérias já estão no cronograma.</div>';
+    body+=`<button class="btn ghost full" data-act="replace" data-from="${sid}" data-to="">Remover do cronograma sem substituir</button><button class="btn ghost full" data-act="close">Decidir depois</button>`;
+  }else body+=`<button class="btn full" data-act="close">Continuar</button>`;
+  openSheet(body);
+}
+function openSlot(d,i){
+  const cur=i>=0?S.schedule[d][i]:null,inDay=new Set(S.schedule[d]);
+  openSheet(`<h2>${DAYS[d]}</h2><p class="sub">${cur?'Trocar '+esc(SJ[cur].s)+' por:':'Adicionar matéria:'}</p>
+  ${SUBJECTS.filter(s=>!inDay.has(s.id)).map(s=>`<button class="pick" data-act="setslot" data-d="${d}" data-i="${i}" data-to="${s.id}"><span class="dot" style="background:${s.c}"></span><span class="grow">${s.e} ${esc(s.n)}</span><span class="sub">${isComplete(s.id)?'✅ concluída':ST.J[s.id].done+'/'+ST.J[s.id].total}</span></button>`).join('')}
+  ${cur?`<button class="btn danger full" data-act="rmslot" data-d="${d}" data-i="${i}">Remover do dia</button>`:''}
+  <button class="btn ghost full" data-act="close">Cancelar</button>`);
+}
+
+/* ============ BACKUP ============ */
+function exportData(){
+  S.settings.lastBackup=new Date().toISOString();save();
+  const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(b);a.download=`estudo-escrivao-pa-${ymd()}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  render();toast('Backup exportado');
+}
+
+/* ============ EVENTOS ============ */
+document.addEventListener('click',ev=>{
+  if(ev.target.id==='sheetBg'){closeSheet();return}
+  const el=ev.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act,id=el.dataset.id,D=el.dataset;
+  switch(a){
+    case'tab':view.tab=D.tab;render(false);scrollTo(0,0);break;
+    case'day':view.day=+D.d;render();break;
+    case'toggle':if(D.close)closeSheet();toggleDone(id);break;
+    case'logq':openLog(id);break;
+    case'detail':openDetail(id);break;
+    case'acc':view.open.has(id)?view.open.delete(id):view.open.add(id);render();break;
+    case'goto':view.tab='edital';view.q='';view.filter='all';view.open.add(id);render(false);setTimeout(()=>document.getElementById('sj-'+id)?.scrollIntoView({block:'start'}),30);break;
+    case'filter':view.filter=D.f;render();break;
+    case'weak':view.weak=D.w;render();break;
+    case'close':closeSheet();break;
+    case'step':{const i=document.getElementById(D.f);i.value=Math.max(0,(+i.value||0)+ +D.v);liveUpd();break}
+    case'savelog':saveLog(id);break;
+    case'delsess':S.sessions=S.sessions.filter(x=>x.id!==id);save();render();openDetail(D.t);break;
+    case'rev':{const t=S.topics[id];t.rev.push(ymd());save();render();toast('Revisão registrada');break}
+    case'sim':openSim();break;
+    case'savesim':saveSim();break;
+    case'complete':openComplete(id);break;
+    case'replace':{
+      for(let d=1;d<=5;d++){const l=S.schedule[d],i=l.indexOf(D.from);if(i<0)continue;
+        if(D.to&&!l.includes(D.to))l[i]=D.to;else l.splice(i,1)}
+      save();closeSheet();render();toast(D.to?`${SJ[D.to].s} entrou no cronograma`:'Matéria removida do cronograma');break}
+    case'slot':openSlot(+D.d,+D.i);break;
+    case'setslot':{const d=+D.d,i=+D.i;if(i>=0)S.schedule[d][i]=D.to;else S.schedule[d].push(D.to);save();closeSheet();render();break}
+    case'rmslot':S.schedule[+D.d].splice(+D.i,1);save();closeSheet();render();break;
+    case'resetplan':if(confirm('Restaurar o cronograma original?')){S.schedule=defState().schedule;save();render()}break;
+    case'export':exportData();break;
+    case'import':$('#file').click();break;
+    case'install':deferredPrompt&&deferredPrompt.prompt();break;
+    case'wipe':if(confirm('Apagar TODOS os seus dados? Isso não pode ser desfeito.')&&confirm('Tem certeza? Exporte um backup antes se quiser guardar.')){try{localStorage.removeItem(KEY)}catch(e){}S=defState();view.open.clear();render();toast('Dados apagados')}break;
+  }
+});
+document.addEventListener('input',ev=>{
+  const t=ev.target;
+  if(t.id==='fh'||t.id==='fe')liveUpd();
+  else if(t.id==='search'){view.q=t.value;ST=ST||compute();$('#edList').innerHTML=edList()}
+  else if(t.id==='goal'){S.settings.goal=clamp(+t.value||75,1,100);save()}
+  else if(t.id==='minq'){S.settings.minQ=clamp(+t.value||5,1,50);save()}
+});
+document.addEventListener('change',ev=>{
+  if(ev.target.id!=='file')return;
+  const f=ev.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||typeof o!=='object'||!Array.isArray(o.sessions))throw 0;
+    if(!confirm('Importar este backup? Ele substitui os dados atuais.'))return;S=normalize(o);save();render();toast('Backup importado')}catch(e){toast('Arquivo inválido')}};
+  r.readAsText(f);ev.target.value='';
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+/* tooltip do gráfico */
+function tipMove(ev){
+  const r=ev.target.closest&&ev.target.closest('.hit');const w=$('#c14');if(!w)return;
+  w.querySelector('.tip')?.remove();if(!r)return;
+  const x=window._c14[+r.dataset.i],n=x.h+x.e,tip=document.createElement('div');tip.className='tip';
+  tip.innerHTML=`<b>${fmtD(x.d)}</b> · ${n} questões<br>${x.h} acertos · ${x.e} erros`;
+  const bb=w.getBoundingClientRect(),rb=r.getBoundingClientRect();
+  tip.style.top='0px';tip.style.left=clamp(rb.left-bb.left-40,0,bb.width-130)+'px';w.appendChild(tip);
+}
+document.addEventListener('pointerover',tipMove);document.addEventListener('pointerdown',tipMove);
+
+/* PWA */
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(view.tab==='mais')render()});
+window.addEventListener('appinstalled',()=>{deferredPrompt=null;toast('App instalado!')});
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+
+load();render(false);
+</script>
+</body>
+</html>
