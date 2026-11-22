@@ -7,8 +7,8 @@
 <meta name="description" content="Controle de estudo e questões para Escrivão da Polícia Civil do Pará">
 <meta name="theme-color" content="#081433">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -88,6 +88,16 @@ nav.nav button.on{color:var(--ac);font-weight:700}
 .note{background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.4);border-radius:12px;padding:10px 12px;font-size:13px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-size:13px;font-weight:600}
+nav.nav button{position:relative}
+.nbadge{position:absolute;top:3px;left:calc(50% + 6px);background:var(--bad);color:#fff;font-style:normal;font-size:10px;font-weight:800;border-radius:99px;min-width:16px;padding:0 4px;line-height:16px;text-align:center}
+.chip.on{background:var(--s2);border-color:var(--ac)}
+.rvt{padding:10px 0;border-top:1px solid var(--line)}
+.rvg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.rvc{border-radius:10px;border:1px solid var(--line);padding:7px 3px;text-align:center;font-size:11.5px;line-height:1.25;color:var(--mu)}
+.rvc b{display:block;font-size:13px;color:var(--tx)}
+.rvc.ok{background:rgba(61,220,151,.18);border-color:var(--good);color:var(--good)}
+.rvc.late{border-color:var(--bad);color:var(--bad);background:rgba(255,107,107,.12)}
+.rvc.today{border-color:var(--mid);color:var(--mid);background:rgba(255,176,32,.14)}
 /* sheet */
 .sheet-bg{position:fixed;inset:0;background:rgba(2,8,25,.7);z-index:30;display:flex;align-items:flex-end;justify-content:center}
 .sheet-bg[hidden]{display:none}
@@ -118,7 +128,8 @@ svg text{fill:var(--mu);font-size:10px}
 <nav class="nav" aria-label="Navegação"><div class="in">
   <button data-act="tab" data-tab="hoje"><span>📅</span>Hoje</button>
   <button data-act="tab" data-tab="edital"><span>📚</span>Edital</button>
-  <button data-act="tab" data-tab="stats"><span>📊</span>Estatísticas</button>
+  <button data-act="tab" data-tab="rev"><span>🔁</span>Revisões<em id="rvb" class="nbadge" hidden></em></button>
+  <button data-act="tab" data-tab="stats"><span>📊</span>Estat.</button>
   <button data-act="tab" data-tab="plano"><span>🗓️</span>Plano</button>
   <button data-act="tab" data-tab="mais"><span>⚙️</span>Mais</button>
 </div></nav>
@@ -290,9 +301,11 @@ const pctOf=(h,n)=>n?Math.round(h/n*100):null;
 const KEY='escrivao-pa-v1';
 const defState=()=>({v:1,topics:{},sessions:[],schedule:{1:['pen'],2:['por'],3:['pp'],4:['con','adm'],5:['rl','inf']},settings:{goal:75,minQ:5,lastBackup:null}});
 let S;
+const RV=[7,15,30];
+const cleanRv=o=>{const r={};RV.forEach(n=>r[n]=o&&typeof o[n]==='string'?o[n]:null);return r};
 function normalize(o){
   const d=defState(); if(!o||typeof o!=='object')return d;
-  if(o.topics&&typeof o.topics==='object')for(const[k,v]of Object.entries(o.topics))if(TP[k]&&v&&typeof v==='object')d.topics[k]={done:typeof v.done==='string'?v.done:null,rev:Array.isArray(v.rev)?v.rev.filter(x=>typeof x==='string'):[]};
+  if(o.topics&&typeof o.topics==='object')for(const[k,v]of Object.entries(o.topics))if(TP[k]&&v&&typeof v==='object')d.topics[k]={done:typeof v.done==='string'?v.done:null,rev:Array.isArray(v.rev)?v.rev.filter(x=>typeof x==='string'):[],rv:cleanRv(v.rv)};
   if(Array.isArray(o.sessions))d.sessions=o.sessions.filter(x=>x&&SJ[x.s]&&typeof x.d==='string'&&Number.isFinite(+x.h)&&Number.isFinite(+x.e)).map(x=>({id:String(x.id||uid()),d:x.d,s:x.s,t:x.t&&TP[x.t]?x.t:null,h:Math.max(0,+x.h|0),e:Math.max(0,+x.e|0),k:x.k==='sim'?'sim':'q',g:x.g?String(x.g):null}));
   if(o.schedule&&typeof o.schedule==='object'){const sc={};for(let i=1;i<=5;i++)sc[i]=Array.isArray(o.schedule[i])?[...new Set(o.schedule[i].filter(s=>SJ[s]))]:[];d.schedule=sc;}
   if(o.settings&&typeof o.settings==='object'){d.settings.goal=clamp(+o.settings.goal||75,1,100);d.settings.minQ=clamp(+o.settings.minQ||5,1,50);d.settings.lastBackup=typeof o.settings.lastBackup==='string'?o.settings.lastBackup:null;}
@@ -320,7 +333,7 @@ function badge(h,e){const n=h+e;if(!n)return'<span class="bd none">sem questões
 function bar(p,t,goal){return`<div class="bar ${t}"><i style="width:${p||0}%"></i>${goal?`<b style="left:${S.settings.goal}%"></b>`:''}</div>`}
 function activityDates(){
   const s=new Set();S.sessions.forEach(x=>s.add(x.d));
-  Object.values(S.topics).forEach(t=>{if(t.done)s.add(t.done);t.rev.forEach(r=>s.add(r))});return s;
+  Object.values(S.topics).forEach(t=>{if(t.done)s.add(t.done);t.rev.forEach(r=>s.add(r));Object.values(t.rv||{}).forEach(r=>{if(r)s.add(r)})});return s;
 }
 function streak(){
   const a=activityDates();let d=new Date();if(!a.has(ymd(d)))d.setDate(d.getDate()-1);
@@ -329,15 +342,16 @@ function streak(){
 const scheduledIds=()=>new Set([].concat(...[1,2,3,4,5].map(d=>S.schedule[d])));
 
 /* ============ VIEW STATE ============ */
-const view={tab:'hoje',day:new Date().getDay(),open:new Set(),q:'',filter:'all',weak:'pct'};
+const view={tab:'hoje',day:new Date().getDay(),open:new Set(),q:'',filter:'all',weak:'pct',rvMode:'pend',rvSubj:'all'};
 let deferredPrompt=null;
 
 function render(keep=true){
   ST=compute();const y=scrollY;
-  const f={hoje:vHoje,edital:vEdital,stats:vStats,plano:vPlano,mais:vMais}[view.tab];
+  const f={hoje:vHoje,edital:vEdital,rev:vRev,stats:vStats,plano:vPlano,mais:vMais}[view.tab];
   $('#app').innerHTML=f();
   document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===view.tab));
-  $('#subtitle').textContent={hoje:'Seu plano de hoje',edital:'Marque os tópicos e registre questões',stats:'Onde você está forte e onde precisa melhorar',plano:'Cronograma semanal',mais:'Backup, metas e instalação'}[view.tab];
+  $('#subtitle').textContent={hoje:'Seu plano de hoje',edital:'Marque os tópicos e registre questões',stats:'Onde você está forte e onde precisa melhorar',plano:'Cronograma semanal',mais:'Backup, metas e instalação',rev:'Revisões em 7, 15 e 30 dias'}[view.tab];
+  const rc=rvCounts(),pn=rc.late+rc.tod,bd=$('#rvb');if(bd){bd.hidden=!pn;bd.textContent=pn>99?'99+':pn}
   if(keep)scrollTo(0,y);
 }
 
@@ -375,7 +389,7 @@ function sortWeak(list){ // piores primeiro; sem questões no meio
 function vHoje(){
   const d=view.day,today=ymd();
   const qToday=S.sessions.filter(x=>x.d===today).reduce((a,x)=>a+x.h+x.e,0);
-  let h=`<div class="kpis"><div class="kpi"><b>${qToday}</b><small>questões hoje</small></div><div class="kpi"><b>${streak()}</b><small>dias seguidos</small></div><div class="kpi"><b>${Math.round(ST.tot.done/ST.tot.total*100)}%</b><small>do edital</small></div></div>${weekStrip()}`;
+  let h=`<div class="kpis"><div class="kpi"><b>${qToday}</b><small>questões hoje</small></div><div class="kpi"><b>${streak()}</b><small>dias seguidos</small></div><div class="kpi"><b>${Math.round(ST.tot.done/ST.tot.total*100)}%</b><small>do edital</small></div></div>${weekStrip()}${rvNote()}`;
   if(S.sessions.length>20&&(!S.settings.lastBackup||(Date.now()-new Date(S.settings.lastBackup))/864e5>14))
     h+=`<div class="note">💾 Faz mais de 14 dias sem backup. <button class="mini" data-act="tab" data-tab="mais">Fazer backup</button></div>`;
   if(d>=1&&d<=5){
@@ -429,6 +443,41 @@ function edList(){
 }
 
 /* ============ ESTATÍSTICAS ============ */
+/* ============ REVISÕES 7/15/30 ============ */
+function addDays(s,n){const[y,m,d]=s.split('-').map(Number);return ymd(new Date(y,m-1,d+n))}
+function daysBetween(a,b){const pa=a.split('-').map(Number),pb=b.split('-').map(Number);return Math.round((new Date(pb[0],pb[1]-1,pb[2])-new Date(pa[0],pa[1]-1,pa[2]))/864e5)}
+function rvItems(tid){const t=S.topics[tid];if(!t||!t.done)return null;const rv=t.rv||cleanRv();return RV.map(n=>({n,due:addDays(t.done,n),done:rv[n]}))}
+function rvStatus(it,today){if(it.done)return'ok';const d=daysBetween(today,it.due);return d<0?'late':d===0?'today':'soon'}
+function rvCounts(){const today=ymd();let late=0,tod=0,soon=0;ALL.forEach(t=>{const its=rvItems(t.id);if(!its)return;its.forEach(it=>{const st=rvStatus(it,today);if(st==='late')late++;else if(st==='today')tod++;else if(st==='soon'&&daysBetween(today,it.due)<=7)soon++})});return{late,tod,soon}}
+function rvNote(){const c=rvCounts(),n=c.late+c.tod;return n?`<div class="note">🔁 ${n} revisão(ões) pendente(s)${c.late?` · ${c.late} atrasada(s)`:''} <button class="mini" data-act="tab" data-tab="rev">Ver</button></div>`:''}
+function rvChip(tid,it,today){
+  const st=rvStatus(it,today),diff=daysBetween(today,it.due);
+  const lb=st==='ok'?'✓ '+fmtD(it.done):st==='late'?`atrasada ${-diff}d`:st==='today'?'hoje':`em ${diff}d · ${fmtD(it.due)}`;
+  return`<button class="rvc ${st}" data-act="rvtoggle" data-id="${tid}" data-n="${it.n}" aria-pressed="${st==='ok'}" aria-label="Revisão de ${it.n} dias"><b>${it.n} dias</b>${lb}</button>`;
+}
+function vRev(){
+  const today=ymd(),c=rvCounts();
+  let h=`<div class="kpis"><div class="kpi"><b style="color:var(--bad)">${c.late}</b><small>atrasadas</small></div><div class="kpi"><b style="color:var(--mid)">${c.tod}</b><small>para hoje</small></div><div class="kpi"><b>${c.soon}</b><small>próximos 7 dias</small></div></div>`;
+  h+=`<div class="note">Cada tópico estudado gera revisões <b>7, 15 e 30 dias</b> depois. Toque em <b>7 dias</b>, <b>15 dias</b> ou <b>30 dias</b> para marcar qual você já revisou; toque de novo para desfazer.</div>`;
+  h+=`<div class="seg">${[['pend','Pendentes'],['next','Próximas'],['all','Todas']].map(([k,l])=>`<button class="${view.rvMode===k?'on':''}" data-act="rvmode" data-m="${k}">${l}</button>`).join('')}</div>`;
+  h+=`<div class="week"><button class="chip ${view.rvSubj==='all'?'on':''}" style="white-space:nowrap" data-act="rvsubj" data-s="all">Todas</button>${SUBJECTS.map(s=>`<button class="chip ${view.rvSubj===s.id?'on':''}" style="white-space:nowrap" data-act="rvsubj" data-s="${s.id}"><span class="dot" style="background:${s.c}"></span>${s.s}</button>`).join('')}</div>`;
+  let any=false;
+  SUBJECTS.filter(s=>view.rvSubj==='all'||view.rvSubj===s.id).forEach(s=>{
+    let rows=ALL.filter(t=>t.sid===s.id).map(t=>({t,its:rvItems(t.id)})).filter(x=>x.its);
+    const sts=x=>x.its.map(it=>({it,st:rvStatus(it,today)}));
+    if(view.rvMode==='pend')rows=rows.filter(x=>sts(x).some(y=>y.st==='late'||y.st==='today'));
+    else if(view.rvMode==='next')rows=rows.filter(x=>sts(x).some(y=>y.st==='soon'&&daysBetween(today,y.it.due)<=7));
+    if(!rows.length)return;any=true;
+    const nd=x=>{const p=x.its.filter(i=>!i.done);return p.length?p[0].due:'9999'};
+    rows.sort((a,b)=>nd(a).localeCompare(nd(b)));
+    let late=0,tod=0;rows.forEach(x=>sts(x).forEach(y=>{if(y.st==='late')late++;else if(y.st==='today')tod++}));
+    h+=`<section class="card"><div class="sj-h"><span class="ico">${s.e}</span><div class="grow"><h3>${esc(s.n)}</h3><div class="sub">${rows.length} tópico(s)${late?` · ${late} atrasada(s)`:''}${tod?` · ${tod} hoje`:''}</div></div></div>
+    ${rows.map(x=>`<div class="rvt"><div style="font-size:14px">${esc(x.t.title)}</div><div class="sub">estudado em ${fmtD(S.topics[x.t.id].done)}</div><div class="rvg">${x.its.map(it=>rvChip(x.t.id,it,today)).join('')}</div></div>`).join('')}</section>`;
+  });
+  if(!any)h+=`<div class="card empty">${view.rvMode==='pend'?'🎉 Nenhuma revisão pendente agora.':view.rvMode==='next'?'Nenhuma revisão prevista para os próximos 7 dias.':'Marque tópicos como estudados no Edital para gerar as revisões.'}</div>`;
+  return h;
+}
+
 function chart14(){
   const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(ymd(d))}
   const data=days.map(d=>{let h=0,e=0;S.sessions.forEach(x=>{if(x.d===d){h+=x.h;e+=x.e}});return{d,h,e}});
@@ -524,7 +573,7 @@ function saveLog(tid){
   save();closeSheet();render();toast(`Registrado: ${h} acertos, ${e} erros`);
   if(comp)setTimeout(()=>openComplete(TP[tid].sid),400);
 }
-function markDone(tid,v){const t=S.topics[tid]||(S.topics[tid]={done:null,rev:[]});t.done=v?ymd():null}
+function markDone(tid,v){const t=S.topics[tid]||(S.topics[tid]={done:null,rev:[],rv:cleanRv()});t.done=v?ymd():null;t.rv=cleanRv()}
 function toggleDone(tid){
   const sid=TP[tid].sid,was=isComplete(sid);
   markDone(tid,!(S.topics[tid]&&S.topics[tid].done));save();render();
@@ -601,6 +650,9 @@ document.addEventListener('click',ev=>{
     case'delsess':S.sessions=S.sessions.filter(x=>x.id!==id);save();render();openDetail(D.t);break;
     case'rev':{const t=S.topics[id];t.rev.push(ymd());save();render();toast('Revisão registrada');break}
     case'sim':openSim();break;
+    case'rvmode':view.rvMode=D.m;render();break;
+    case'rvsubj':view.rvSubj=D.s;render();break;
+    case'rvtoggle':{const t=S.topics[id];if(!t||!t.done)break;const rv=t.rv||(t.rv=cleanRv());rv[D.n]=rv[D.n]?null:ymd();save();render();toast(rv[D.n]?`Revisão de ${D.n} dias marcada ✓`:'Marcação desfeita');break}
     case'savesim':saveSim();break;
     case'complete':openComplete(id);break;
     case'replace':{
