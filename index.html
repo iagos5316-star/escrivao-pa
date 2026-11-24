@@ -98,6 +98,10 @@ nav.nav button{position:relative}
 .rvc.ok{background:rgba(61,220,151,.18);border-color:var(--good);color:var(--good)}
 .rvc.late{border-color:var(--bad);color:var(--bad);background:rgba(255,107,107,.12)}
 .rvc.today{border-color:var(--mid);color:var(--mid);background:rgba(255,176,32,.14)}
+.lsn{margin:8px 0;background:var(--bg);border-radius:12px;padding:6px 10px}
+.lstep{align-items:center;gap:6px}
+.lstep button{width:38px;height:34px;border-radius:10px;background:var(--s2);font-size:20px;font-weight:700}
+.lstep b{min-width:30px;text-align:center;font-size:18px}
 /* sheet */
 .sheet-bg{position:fixed;inset:0;background:rgba(2,8,25,.7);z-index:30;display:flex;align-items:flex-end;justify-content:center}
 .sheet-bg[hidden]{display:none}
@@ -141,12 +145,12 @@ const SUBJECTS=[
 {id:'por',n:'Língua Portuguesa',s:'Português',c:'#22c55e',e:'📝',t:[
 '1. Compreensão e interpretação de textos de gêneros variados',
 '2. Reconhecimento de tipos e gêneros textuais',
-'3. Ortografia oficial',
-'4.1 Coesão: referenciação, substituição, repetição e conectores',
+'3. Domínio da ortografia oficial',
+'4.1 Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual',
 '4.2 Emprego de tempos e modos verbais',
 '5.1 Emprego das classes de palavras',
-'5.2 Coordenação entre orações e entre termos da oração',
-'5.3 Subordinação entre orações e entre termos da oração',
+'5.2 Relações de coordenação entre orações e entre termos da oração',
+'5.3 Relações de subordinação entre orações e entre termos da oração',
 '5.4 Emprego dos sinais de pontuação',
 '5.5 Concordância verbal e nominal',
 '5.6 Regência verbal e nominal',
@@ -154,132 +158,130 @@ const SUBJECTS=[
 '5.8 Colocação dos pronomes átonos',
 '6.1 Significação das palavras',
 '6.2 Substituição de palavras ou de trechos de texto',
-'6.3 Reorganização da estrutura de orações e períodos',
-'6.4 Reescrita de textos: gêneros e níveis de formalidade']},
+'6.3 Reorganização da estrutura de orações e de períodos do texto',
+'6.4 Reescrita de textos de diferentes gêneros e níveis de formalidade']},
 {id:'rl',n:'Raciocínio Lógico',s:'Rac. Lógico',c:'#f97316',e:'🧩',t:[
 '1. Estruturas lógicas',
-'2. Lógica de argumentação: analogias, inferências, deduções',
-'3.1 Proposições simples e compostas; valores lógicos',
-'3.2 Conectivos e tabela-verdade',
-'3.3 Proposições equivalentes e Leis de Morgan',
-'4.1 Princípios fundamentais da contagem',
-'4.2 Probabilidade']},
+'2. Lógica de argumentação. Analogias, inferências, deduções e lógicas',
+'3. Lógica sentencial (ou proposicional): proposições simples e compostas; valores lógicos',
+'3. Conectivos e tabela-verdade',
+'3. Proposições equivalentes e Leis de Morgan',
+'4. Princípios fundamentais da contagem',
+'4. Probabilidade']},
 {id:'inf',n:'Noções de Informática',s:'Informática',c:'#06b6d4',e:'💻',t:[
 '1.1 Organização e arquitetura de computadores',
 '1.2 Componentes de um computador (hardware e software)',
 '1.3 Sistemas de entrada, saída e armazenamento',
 '1.4 Princípios de sistemas operacionais',
-'2.1 Introdução a redes; redes locais, metropolitanas e longa distância',
-'2.2 Terminologia, topologias, modelos OSI/ISO e TCP/IP, protocolos',
-'2.3 Vírus, worms e pragas virtuais',
-'2.4 Aplicativos de segurança (antivírus, firewall, anti-spyware)',
-'3.1 Navegação, correio eletrônico, grupos de discussão, busca e redes sociais',
-'3.2 Acesso remoto, transferência de arquivos, áudio, vídeo e multimídia',
-'3.3 Navegadores (Internet Explorer, Firefox e Chrome)',
-'4.1 Windows 10',
-'4.2 GNU Linux',
-'5.1 Editores de texto (Word e Writer)',
-'5.2 Planilhas (Excel e Calc)',
-'5.3 Apresentações (PowerPoint e Impress)',
-'6. Teoria da informação: dados, informação, conhecimento, segurança e inteligência']},
+'2.1 Introdução a redes (computação/telecomunicações)',
+'2.2 Redes de computadores: locais, metropolitanas e de longa distância',
+'2.3 Noções de terminologia e aplicações, topologias, modelos de arquitetura (OSI/ISO e TCP/IP) e protocolos',
+'2.4 Noções de vírus, worms e pragas virtuais',
+'2.5 Aplicativos para segurança (antivírus, firewall, anti-spyware etc)',
+'3.1 Ferramentas e aplicativos comerciais de navegação, de correio eletrônico, de grupos de discussão, de busca, de pesquisas e de redes sociais',
+'3.2 Acesso a distância a computadores, transferência de informação e arquivos, aplicativos de áudio, vídeo e multimídia',
+'3.3 Programas de navegação (Microsoft Internet Explorer, Mozilla Firefox e Google Chrome)',
+'4.1 Noções de sistema operacional Windows: Windows 10',
+'4.2 Noções de sistema operacional GNU Linux. Características do sistema operacional GNU Linux',
+'5. Edição de textos, planilhas e apresentações (ambientes Microsoft e LibreOffice)',
+'6. Teoria da informação: conceitos de informação, dados, representação de dados, conhecimentos, segurança e inteligência']},
 {id:'par',n:'Conhecimentos sobre o Estado do Pará',s:'Pará',c:'#84cc16',e:'🌳',t:[
-'1.1 Realidade histórica do Pará',
-'1.2 Realidade geográfica do Pará',
-'1.3 Realidade étnica, social e cultural do Pará',
-'1.4 Realidade política e econômica do Pará',
-'2. Questão agrária, minerária e conflitos territoriais no Pará',
-'3. Regiões Integradas de Segurança Pública (Res. 185/2012 – CONSEP)',
+'1. Realidade étnica, social, histórica, geográfica, cultural, política e econômica do Estado do Pará',
+'2. A questão agrária e minerária e os conflitos territoriais no Estado do Pará',
+'3. Particularidades socioeconômicas das Regiões Integradas de Segurança Pública (Resolução nº 185/2012 – CONSEP)',
 '4. Constituição do Estado do Pará']},
 {id:'adm',n:'Noções de Direito Administrativo',s:'Administrativo',c:'#eab308',e:'🏛️',t:[
 '1.1 Centralização, descentralização, concentração e desconcentração',
 '1.2 Administração direta e indireta',
-'1.3 Autarquias, fundações, empresas públicas e sociedades de economia mista',
-'2.1 Ato administrativo: conceito, requisitos e atributos',
-'2.2 Ato administrativo: classificação e espécies',
-'3.1 Agente público e disposições constitucionais aplicáveis',
-'3.2 Lei Orgânica da Polícia Civil do Pará (LC 022/1994)',
-'3.3 Regime Jurídico Único dos Servidores do Pará (Lei 5.810/1994)',
-'4.1 Poderes: hierárquico, disciplinar, regulamentar e de polícia',
+'1.3 Autarquias, fundações, empresas públicas e sociedade de economia mista',
+'2. Ato administrativo: conceito, requisitos, atributos, classificação e espécies',
+'3.1.2 Lei Orgânica da Polícia Civil do Estado do Pará (Lei Complementar nº 022/1994 e alterações)',
+'3.1.3 Regime Jurídico Único dos Servidores Públicos Civis da Administração Direta, das Autarquias e das Fundações Públicas do Estado do Pará (Lei Estadual nº 5.810/1994 e alterações)',
+'3.1.4 Disposições constitucionais aplicáveis',
+'4.1 Poderes administrativos: hierárquico, disciplinar, regulamentar e de polícia',
 '4.2 Uso e abuso do poder',
-'5.1 Licitações (Lei 8.666/93): princípios',
+'5.1 Licitações e contratos (Lei nº 8.666/93 e alterações): princípios',
 '5.2 Contratação direta, dispensa e inexigibilidade',
 '5.3 Modalidades, tipos e procedimentos',
-'6. Controle da administração: judicial e legislativo',
-'7.1 Responsabilidade civil do Estado: ato comissivo e omissão',
-'7.2 Requisitos, excludentes e atenuantes da responsabilidade do Estado',
-'8. Lei Estadual 8.972/2020 (processo administrativo do Pará)']},
+'6.1 Controle da administração pública: controle judicial',
+'6.2 Controle da administração pública: controle legislativo',
+'7.1 Responsabilidade civil do Estado: responsabilidade por ato comissivo do Estado',
+'7.2 Responsabilidade por omissão do Estado',
+'7.3 Requisitos para a demonstração da responsabilidade do Estado',
+'7.4 Causas excludentes e atenuantes da responsabilidade do Estado',
+'8. Lei Estadual nº 8.972/2020 (processo administrativo no âmbito da Administração Pública do Estado do Pará)']},
 {id:'con',n:'Noções de Direito Constitucional',s:'Constitucional',c:'#14b8a6',e:'📜',t:[
-'1.1 Direitos e deveres individuais e coletivos (vida, liberdade, igualdade, segurança, propriedade)',
-'1.2 Direitos sociais',
-'1.3 Nacionalidade',
-'1.4 Cidadania, direitos políticos e partidos políticos',
-'1.5 Garantias constitucionais individuais, coletivas, sociais e políticas',
+'1. Direitos e garantias fundamentais: direitos e deveres individuais e coletivos; direito à vida, à liberdade, à igualdade, à segurança e à propriedade',
+'1. Direitos sociais',
+'1. Nacionalidade',
+'1. Cidadania e direitos políticos; partidos políticos',
+'1. Garantias constitucionais individuais; garantias dos direitos coletivos, sociais e políticos',
 '2. Administração Pública',
-'3. Poder Executivo: forma e sistema de governo; chefia de Estado e de governo',
-'4. Defesa do Estado e das instituições democráticas; segurança pública',
-'5.1 Ordem social: base, objetivos e seguridade social',
-'5.2 Meio ambiente',
-'5.3 Família, criança, adolescente, idoso e índio']},
+'3. Poder Executivo: forma e sistema de governo; chefia de Estado e chefia de governo',
+'4. Defesa do Estado e das instituições democráticas: segurança pública; organização da segurança pública',
+'5. Ordem social: base e objetivos da ordem social; seguridade social',
+'5. Ordem social: meio ambiente',
+'5. Ordem social: família, criança, adolescente, idoso, índio']},
 {id:'pen',n:'Noções de Direito Penal',s:'Penal',c:'#3b82f6',e:'⚖️',t:[
 '1. Princípios básicos do Direito Penal',
-'2.1 Lei penal no tempo: tempo do crime, irretroatividade, lei excepcional e temporária',
-'2.2 Lei penal no espaço e lugar do crime',
+'2.1 A lei penal no tempo e no espaço: tempo e lugar do crime',
+'2.2 Lei penal excepcional, especial e temporária',
 '2.3 Contagem de prazo',
-'3.1 Conceito analítico de crime (típico, ilícito e culpável)',
-'3.2 Crime consumado e tentado',
-'3.3 Ilicitude, causas de exclusão e excesso punível',
+'2.4 Irretroatividade da lei penal',
+'3. Conceito analítico de crime (típico, ilícito e culpável)',
+'3.1 Crime consumado e tentado',
+'3.2 Ilicitude e causas de exclusão',
+'3.3 Excesso punível',
 '4. Concurso de pessoas',
-'5.1 Crimes contra a pessoa: contra a vida',
-'5.2 Crimes contra a pessoa: lesão corporal e periclitação da vida',
-'5.3 Crimes contra a pessoa: honra e liberdade individual',
-'6.1 Crimes contra o patrimônio: furto',
-'6.2 Crimes contra o patrimônio: roubo e extorsão',
-'6.3 Crimes contra o patrimônio: apropriação, estelionato, receptação e demais',
-'7.1 Crimes contra a administração pública: praticados por funcionário público',
-'7.2 Crimes contra a administração pública: praticados por particular',
-'8. Disposições constitucionais aplicáveis ao Direito Penal']},
+'5. Crimes contra a pessoa',
+'6. Crimes contra o patrimônio',
+'7. Crimes contra a administração pública',
+'8. Disposições constitucionais aplicáveis ao direito penal']},
 {id:'pp',n:'Noções de Direito Processual Penal',s:'Proc. Penal',c:'#a855f7',e:'🔨',t:[
-'1. Disposições preliminares do CPP',
-'2.1 Inquérito policial: conceito, natureza, finalidade, características e titularidade',
-'2.2 Inquérito policial: instauração, notitia criminis, delatio criminis e procedimentos investigativos',
-'2.3 Inquérito policial: indiciamento, garantias do investigado, valor probatório e conclusão',
+'1. Disposições preliminares do Código de Processo Penal',
+'2. Inquérito policial: histórico, natureza, conceito, finalidade, características, fundamento, titularidade, grau de cognição, valor probatório, formas de instauração, notitia criminis, delatio criminis, procedimentos investigativos, indiciamento, garantias do investigado, conclusão',
 '3. Ação penal',
 '4. Competência',
 '5. Prova',
 '6. Citações e intimações',
-'7.1 Prisão em flagrante e demais espécies de prisão',
-'7.2 Liberdade provisória, fiança e medidas cautelares',
-'8. Disposições constitucionais aplicáveis ao Processo Penal',
-'9. Lei 9.099/1995 (Juizados Especiais)']},
+'7. Prisão e liberdade provisória',
+'8. Disposições constitucionais aplicáveis ao direito processual penal',
+'9. Lei nº 9.099/1995']},
 {id:'esp',n:'Legislação Especial',s:'Leg. Especial',c:'#ec4899',e:'🚨',t:[
-'1. Abuso de Autoridade (Lei 13.869/2019)',
-'2. Drogas (Lei 11.343/2006)',
-'3. Interceptação telefônica (Lei 9.296/1996)',
-'4. Organizações criminosas (Lei 12.850/2013)',
-'5. Proteção à testemunha e delação premiada (Lei 9.807/1999)',
-'6. Tortura (Lei 9.455/1997)',
-'7. Armas e SINARM (Lei 10.826/2003)',
-'8. Crimes contra crianças e adolescentes (Lei 8.069/1990)',
-'9. Crimes de preconceito de raça ou de cor (Lei 7.716/1989)',
-'10. Lavagem de dinheiro (Lei 9.613/1998)',
-'11. Violência doméstica – Maria da Penha (Lei 11.340/2006)']},
+'1. Nova Lei de Abuso de Autoridade (Lei 13.869/2019)',
+'2. Tráfico ilícito e uso de substâncias entorpecentes (Lei nº 11.343/2006)',
+'3. Interceptação telefônica (Lei nº 9.296/1996 e suas alterações)',
+'4. Crime organizado (Lei nº 12.850, de 2 de agosto de 2013 – nova lei do crime organizado)',
+'5. Proteção à testemunha e delação premiada (Lei nº 9.807/99)',
+'6. O crime de tortura (Lei nº 9.455/97)',
+'7. Registro, posse e comercialização de armas e o Sistema Nacional de Armas (Lei nº 10.826/2003)',
+'8. Dos crimes contra crianças e adolescentes (Lei nº 8.069/90)',
+'9. Dos crimes resultantes de preconceito de raça ou de cor (Lei nº 7.716/89)',
+'10. Lavagem ou ocultação de bens, direitos e valores (Lei nº 9.613/98 e suas alterações)',
+'11. Violência doméstica e familiar contra a mulher (Lei nº 11.340/2006 e suas alterações)']},
 {id:'arq',n:'Arquivologia',s:'Arquivologia',c:'#94a3b8',e:'🗄️',t:[
 '1. Arquivística: princípios e conceitos',
-'2.1 Gestão da informação e de documentos; protocolo',
+'2.1 Gestão da informação e de documentos. Protocolo: recebimento, registro, distribuição, tramitação e expedição de documentos',
 '2.2 Classificação de documentos de arquivo',
-'2.3 Arquivamento e ordenação',
-'2.4 Tabela de temporalidade',
-'3. Acondicionamento e armazenamento',
-'4. Preservação e conservação',
-'5. Tipologias documentais e suportes físicos (microfilmagem, automação, restauração)']},
+'2.3 Arquivamento e ordenação de documentos de arquivo',
+'2.4 Tabela de temporalidade de documentos de arquivo',
+'3. Acondicionamento e armazenamento de documentos de arquivo',
+'4. Preservação e conservação de documentos de arquivo',
+'5. Tipologias documentais e suportes físicos: microfilmagem; automação; preservação, conservação e restauração de documentos']},
 {id:'est',n:'Noções de Estatística',s:'Estatística',c:'#818cf8',e:'📊',t:[
-'1.1 Estatística descritiva: gráficos, diagramas e tabelas',
-'1.2 Medidas de posição',
-'1.3 Medidas de dispersão',
-'1.4 Assimetria e curtose',
+'1. Estatística descritiva e análise exploratória de dados: gráficos, diagramas, tabelas, medidas descritivas (posição, dispersão, assimetria e curtose)',
 '2. Probabilidade: definições básicas e axiomas',
 '3. Probabilidade condicional e independência']}
 ];
+/* Migração v1 -> v2: lista de tópicos agora segue o edital; cada posição antiga aponta para a(s) nova(s) */
+const MIG={
+ inf:[[0],[1],[2],[3],[4,5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[14],[14],[15]],
+ par:[[0],[0],[0],[0],[1],[2],[3]],
+ adm:[[0],[1],[2],[3],[3],[6],[4],[5],[7],[8],[9],[10],[11],[12,13],[14,15],[16,17],[18]],
+ pen:[[0],[1],[2],[3,4],[5],[6],[7,8],[9],[10],[10],[10],[11],[11],[11],[12],[12],[13]],
+ pp:[[0],[1],[1],[1],[2],[3],[4],[5],[6],[6],[7],[8]],
+ est:[[0],[0],[0],[0],[1],[2]]
+};
 const SJ={},TP={},ALL=[];
 SUBJECTS.forEach(s=>{SJ[s.id]=s;s.t.forEach((title,i)=>{const id=s.id+'.'+i;TP[id]={id,sid:s.id,title};ALL.push(TP[id]);});});
 const DAYS=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
@@ -299,19 +301,34 @@ const pctOf=(h,n)=>n?Math.round(h/n*100):null;
 
 /* ============ ESTADO ============ */
 const KEY='escrivao-pa-v1';
-const defState=()=>({v:1,topics:{},sessions:[],schedule:{1:['pen'],2:['por'],3:['pp'],4:['con','adm'],5:['rl','inf']},settings:{goal:75,minQ:5,lastBackup:null}});
+const defState=()=>({v:2,topics:{},sessions:[],lessons:{},schedule:{1:['pen'],2:['por'],3:['pp'],4:['con','adm'],5:['rl','inf']},settings:{goal:75,minQ:5,lastBackup:null}});
 let S;
 const RV=[7,15,30];
 const cleanRv=o=>{const r={};RV.forEach(n=>r[n]=o&&typeof o[n]==='string'?o[n]:null);return r};
-function normalize(o){
+function migrateV1(o){
+  const out=Object.assign({},o,{v:2,topics:{},sessions:[]}),T=o.topics&&typeof o.topics==='object'?o.topics:{},src={};
+  for(const sid in MIG)MIG[sid].forEach((news,old)=>news.forEach(n=>{(src[sid+'.'+n]=src[sid+'.'+n]||[]).push(sid+'.'+old)}));
+  for(const[k,v]of Object.entries(T)){if(!MIG[k.split('.')[0]])out.topics[k]=v}
+  for(const nk in src){
+    const ss=src[nk].map(k=>T[k]);
+    if(!ss.every(t=>t&&typeof t.done==='string'))continue; // só conta como estudado se TODOS os tópicos antigos que o formam estavam estudados
+    out.topics[nk]={done:ss.map(t=>t.done).sort().pop(),rev:[...new Set([].concat(...ss.map(t=>Array.isArray(t.rev)?t.rev:[])))].sort(),rv:ss[0].rv||null};
+  }
+  out.sessions=(Array.isArray(o.sessions)?o.sessions:[]).map(x=>{
+    if(x&&typeof x.t==='string'){const[sid,i]=x.t.split('.');if(MIG[sid]&&MIG[sid][+i])return Object.assign({},x,{t:sid+'.'+MIG[sid][+i][0]})}
+    return x});
+  return out;
+}
+function normalize(o){if(o&&typeof o==='object'&&(+o.v||1)<2)o=migrateV1(o);
   const d=defState(); if(!o||typeof o!=='object')return d;
   if(o.topics&&typeof o.topics==='object')for(const[k,v]of Object.entries(o.topics))if(TP[k]&&v&&typeof v==='object')d.topics[k]={done:typeof v.done==='string'?v.done:null,rev:Array.isArray(v.rev)?v.rev.filter(x=>typeof x==='string'):[],rv:cleanRv(v.rv)};
   if(Array.isArray(o.sessions))d.sessions=o.sessions.filter(x=>x&&SJ[x.s]&&typeof x.d==='string'&&Number.isFinite(+x.h)&&Number.isFinite(+x.e)).map(x=>({id:String(x.id||uid()),d:x.d,s:x.s,t:x.t&&TP[x.t]?x.t:null,h:Math.max(0,+x.h|0),e:Math.max(0,+x.e|0),k:x.k==='sim'?'sim':'q',g:x.g?String(x.g):null}));
   if(o.schedule&&typeof o.schedule==='object'){const sc={};for(let i=1;i<=5;i++)sc[i]=Array.isArray(o.schedule[i])?[...new Set(o.schedule[i].filter(s=>SJ[s]))]:[];d.schedule=sc;}
+  if(o.lessons&&typeof o.lessons==='object')for(const[dt,m]of Object.entries(o.lessons)){if(!/^\d{4}-\d{2}-\d{2}$/.test(dt)||!m||typeof m!=='object')continue;const r={};for(const[sid,n]of Object.entries(m)){const v=clamp(+n|0,0,99);if(SJ[sid]&&v)r[sid]=v}if(Object.keys(r).length)d.lessons[dt]=r}
   if(o.settings&&typeof o.settings==='object'){d.settings.goal=clamp(+o.settings.goal||75,1,100);d.settings.minQ=clamp(+o.settings.minQ||5,1,50);d.settings.lastBackup=typeof o.settings.lastBackup==='string'?o.settings.lastBackup:null;}
   return d;
 }
-function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return}}catch(e){}S=defState()}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const raw=JSON.parse(r);S=normalize(raw);if((+raw.v||1)<2)save();return}}catch(e){}S=defState()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('⚠️ Não foi possível salvar neste navegador')}}
 
 /* ============ ESTATÍSTICAS ============ */
@@ -333,7 +350,7 @@ function badge(h,e){const n=h+e;if(!n)return'<span class="bd none">sem questões
 function bar(p,t,goal){return`<div class="bar ${t}"><i style="width:${p||0}%"></i>${goal?`<b style="left:${S.settings.goal}%"></b>`:''}</div>`}
 function activityDates(){
   const s=new Set();S.sessions.forEach(x=>s.add(x.d));
-  Object.values(S.topics).forEach(t=>{if(t.done)s.add(t.done);t.rev.forEach(r=>s.add(r));Object.values(t.rv||{}).forEach(r=>{if(r)s.add(r)})});return s;
+  Object.values(S.topics).forEach(t=>{if(t.done)s.add(t.done);t.rev.forEach(r=>s.add(r));Object.values(t.rv||{}).forEach(r=>{if(r)s.add(r)})});Object.keys(S.lessons||{}).forEach(d=>s.add(d));return s;
 }
 function streak(){
   const a=activityDates();let d=new Date();if(!a.has(ymd(d)))d.setDate(d.getDate()-1);
@@ -364,6 +381,33 @@ function topicRow(t,opt={}){
     <button class="mini" data-act="logq" data-id="${t.id}">+ Questões</button>
   </div>`;
 }
+/* ---- aulas assistidas ---- */
+function lessonsOn(d,sid){return(S.lessons[d]&&S.lessons[d][sid])||0}
+function lessonsDay(d){return Object.values(S.lessons[d]||{}).reduce((a,b)=>a+b,0)}
+function setLessons(d,sid,n){n=clamp(n|0,0,99);const o=S.lessons[d]||(S.lessons[d]={});if(n)o[sid]=n;else{delete o[sid];if(!Object.keys(o).length)delete S.lessons[d]}save()}
+function dow(d){const[y,m,dd]=d.split('-').map(Number);return DS[new Date(y,m-1,dd).getDay()]}
+function lstep(d,sid,sheet){const n=lessonsOn(d,sid);return`<div class="step lstep"><button data-act="lsn" data-s="${sid}" data-d="${d}" data-v="-1" ${sheet?'data-sheet="1"':''} aria-label="menos uma aula">−</button><b aria-live="polite">${n}</b><button data-act="lsn" data-s="${sid}" data-d="${d}" data-v="1" ${sheet?'data-sheet="1"':''} aria-label="mais uma aula">+</button></div>`}
+function lessonRow(sid){return`<div class="row sp lsn"><span class="sub">🎬 Aulas assistidas hoje</span>${lstep(ymd(),sid,false)}</div>`}
+function lessonsCard(){
+  const today=ymd(),days=[];for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);days.push(ymd(d))}
+  const tot=sid=>Object.values(S.lessons).reduce((a,o)=>a+(o[sid]||0),0);
+  const wk=sid=>days.reduce((a,d)=>a+lessonsOn(d,sid),0);
+  const gT=SUBJECTS.reduce((a,x)=>a+tot(x.id),0),gW=SUBJECTS.reduce((a,x)=>a+wk(x.id),0);
+  let h=`<section class="card"><h2>🎬 Aulas assistidas</h2>
+  <div class="kpis"><div class="kpi"><b>${lessonsDay(today)}</b><small>hoje</small></div><div class="kpi"><b>${gW}</b><small>últimos 7 dias</small></div><div class="kpi"><b>${gT}</b><small>total</small></div></div>
+  <div style="margin-top:10px;overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:var(--mu);text-align:right"><th style="text-align:left;font-weight:600;padding:4px 0">Matéria</th><th>Hoje</th><th>7 dias</th><th>Total</th></tr>
+  ${SUBJECTS.map(x=>`<tr style="border-top:1px solid var(--line);text-align:right;${tot(x.id)?'':'color:var(--mu)'}"><td style="text-align:left;padding:6px 0"><span class="dot" style="background:${x.c};display:inline-block;margin-right:6px"></span>${esc(x.s)}</td><td>${lessonsOn(today,x.id)}</td><td>${wk(x.id)}</td><td><b>${tot(x.id)}</b></td></tr>`).join('')}</table></div>
+  <h2 style="margin:14px 0 6px;font-size:14px">Por dia (últimos 7 dias)</h2>
+  ${days.map(d=>{const o=S.lessons[d]||{},ks=SUBJECTS.filter(x=>o[x.id]);return`<div class="hist"><span style="min-width:74px"><b>${dow(d)}</b> ${fmtD(d)}</span><span class="grow sub">${ks.length?ks.map(x=>`${esc(x.s)} ${o[x.id]}`).join(' · '):'—'}</span><b>${lessonsDay(d)}</b></div>`}).join('')}
+  <button class="btn sec full" style="margin-top:10px" data-act="lessons">Registrar ou corrigir aulas de outro dia</button></section>`;
+  return h;
+}
+function openLessons(d){
+  d=d||ymd();
+  openSheet(`<h2>🎬 Aulas assistidas</h2><div class="field"><label for="ld">Data</label><input id="ld" type="date" value="${d}" max="${ymd()}"></div>
+  ${SUBJECTS.map(x=>`<div class="row sp"><div class="row grow"><span class="dot" style="background:${x.c}"></span><span style="font-size:14px">${esc(x.s)}</span></div>${lstep(d,x.id,true)}</div>`).join('')}
+  <div class="sub" style="text-align:center">Total do dia: <b>${lessonsDay(d)}</b></div><button class="btn full" data-act="close">Pronto</button>`);
+}
 function subjCard(sid,{next=3}={}){
   const s=SJ[sid],j=ST.J[sid],p=Math.round(j.done/j.total*100),comp=j.done===j.total;
   const pending=ALL.filter(t=>t.sid===sid&&!ST.T[t.id].done).slice(0,next);
@@ -371,7 +415,7 @@ function subjCard(sid,{next=3}={}){
   return`<section class="card"><div class="sj-h"><span class="ico">${s.e}</span><div class="grow"><h3>${esc(s.n)}</h3>
     <div class="sub">${j.done}/${j.total} tópicos · ${j.n} questões ${acc!==null?`· ${acc}% acerto`:''}</div></div>
     <button class="mini" data-act="goto" data-id="${sid}">Edital</button></div>
-    <div style="margin:10px 0 4px">${bar(p,comp?'good':'mid')}</div>
+    <div style="margin:10px 0 4px">${bar(p,comp?'good':'mid')}</div>${lessonRow(sid)}
     ${comp?`<div class="note" style="margin-top:8px">🎉 Matéria concluída! No domingo ela vira só questões. <button class="mini" data-act="complete" data-id="${sid}">Trocar no cronograma</button></div>`:
     `<div class="sub" style="margin-top:8px">Próximos tópicos:</div>${pending.map(t=>topicRow(t)).join('')}`}
   </section>`;
@@ -389,7 +433,7 @@ function sortWeak(list){ // piores primeiro; sem questões no meio
 function vHoje(){
   const d=view.day,today=ymd();
   const qToday=S.sessions.filter(x=>x.d===today).reduce((a,x)=>a+x.h+x.e,0);
-  let h=`<div class="kpis"><div class="kpi"><b>${qToday}</b><small>questões hoje</small></div><div class="kpi"><b>${streak()}</b><small>dias seguidos</small></div><div class="kpi"><b>${Math.round(ST.tot.done/ST.tot.total*100)}%</b><small>do edital</small></div></div>${weekStrip()}${rvNote()}`;
+  let h=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)"><div class="kpi"><b>${qToday}</b><small>questões hoje</small></div><div class="kpi"><b>${lessonsDay(today)}</b><small>aulas hoje</small></div><div class="kpi"><b>${streak()}</b><small>dias seguidos</small></div><div class="kpi"><b>${Math.round(ST.tot.done/ST.tot.total*100)}%</b><small>do edital</small></div></div>${weekStrip()}${rvNote()}`;
   if(S.sessions.length>20&&(!S.settings.lastBackup||(Date.now()-new Date(S.settings.lastBackup))/864e5>14))
     h+=`<div class="note">💾 Faz mais de 14 dias sem backup. <button class="mini" data-act="tab" data-tab="mais">Fazer backup</button></div>`;
   if(d>=1&&d<=5){
@@ -437,7 +481,7 @@ function edList(){
     any=true;
     const j=ST.J[s.id],p=Math.round(j.done/j.total*100),open=view.open.has(s.id)||!!q||view.filter!=='all';
     return`<section class="card ${open?'open':''}" id="sj-${s.id}"><button class="acc-h" data-act="acc" data-id="${s.id}"><div class="sj-h"><span class="ico">${s.e}</span><div class="grow"><h3>${esc(s.n)}</h3><div class="sub">${j.done}/${j.total} tópicos · ${j.n} questões</div></div>${badge(j.h,j.e)}<span class="chev">▶</span></div><div style="margin-top:10px">${bar(p,j.done===j.total?'good':'mid')}</div></button>
-    ${open?`<div style="margin-top:8px">${ts.map(t=>topicRow(t)).join('')}</div>`:''}</section>`;
+    ${open?`${lessonRow(s.id)}<div style="margin-top:8px">${ts.map(t=>topicRow(t)).join('')}</div>`:''}</section>`;
   }).join('');
   return any?out:'<div class="card empty">Nenhum tópico encontrado.</div>';
 }
@@ -515,6 +559,7 @@ function vStats(){
   `<div class="empty">${view.weak==='pct'?`Registre pelo menos <b>${minQ} questões</b> em um tópico para ele entrar no ranking.`:'Nenhum erro registrado ainda.'}</div>`}</section>`;
   const nq=sortWeak(ALL.filter(t=>ST.T[t.id].done&&!ST.T[t.id].n)).slice(0,8);
   if(nq.length)h+=`<section class="card"><h2>⚠️ Estudou, mas ainda sem questões</h2><p class="sub">Questões são o que fixa o conteúdo. Comece por aqui:</p>${nq.map(t=>topicRow(t,{showSubj:true})).join('')}</section>`;
+  h+=lessonsCard();
   h+=`<section class="card"><h2>Por matéria</h2>${SUBJECTS.map(s=>{const j=ST.J[s.id],p=pctOf(j.h,j.n),tr=tier(p,j.n);return`<div class="wk" data-act="goto" data-id="${s.id}"><div class="row"><span class="dot" style="background:${s.c}"></span><div class="grow" style="font-size:14px;font-weight:600">${esc(s.s)}</div><span class="sub">${j.done}/${j.total} tópicos</span>${j.n?`<span class="bd ${tr}">${p}%</span>`:'<span class="bd none">–</span>'}</div>${bar(p||0,tr,true)}<div class="sub">${j.n} questões · ${j.h} acertos · ${j.e} erros</div></div>`}).join('')}
   <p class="sub" style="margin-top:6px">A linha branca marca sua meta de ${goal}%.</p></section>`;
   return h;
@@ -650,6 +695,8 @@ document.addEventListener('click',ev=>{
     case'delsess':S.sessions=S.sessions.filter(x=>x.id!==id);save();render();openDetail(D.t);break;
     case'rev':{const t=S.topics[id];t.rev.push(ymd());save();render();toast('Revisão registrada');break}
     case'sim':openSim();break;
+    case'lsn':setLessons(D.d,D.s,lessonsOn(D.d,D.s)+ +D.v);render();if(D.sheet)openLessons(D.d);break;
+    case'lessons':openLessons();break;
     case'rvmode':view.rvMode=D.m;render();break;
     case'rvsubj':view.rvSubj=D.s;render();break;
     case'rvtoggle':{const t=S.topics[id];if(!t||!t.done)break;const rv=t.rv||(t.rv=cleanRv());rv[D.n]=rv[D.n]?null:ymd();save();render();toast(rv[D.n]?`Revisão de ${D.n} dias marcada ✓`:'Marcação desfeita');break}
@@ -683,6 +730,7 @@ document.addEventListener('change',ev=>{
     if(!confirm('Importar este backup? Ele substitui os dados atuais.'))return;S=normalize(o);save();render();toast('Backup importado')}catch(e){toast('Arquivo inválido')}};
   r.readAsText(f);ev.target.value='';
 });
+document.addEventListener('change',ev=>{if(ev.target.id==='ld'&&ev.target.value)openLessons(ev.target.value)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
 /* tooltip do gráfico */
 function tipMove(ev){
